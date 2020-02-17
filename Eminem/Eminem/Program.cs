@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 using Emionov_root;
 
 
-
-
-
-
 namespace Eminem
 {
-
     class Program
     {
         static string CabelDlinaFloor;
@@ -38,7 +33,7 @@ namespace Eminem
 
                 string message = "Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант.\n Например, 901: ";
                 int nom_var = GetInt(message);
-                document.Replase("VariantKurs", Convert.ToString(nom_var));
+                document.Replase("VariantKurs", nom_var.ToString());
 
                 message = "Введите количество используемых Информационных систем: ";
                 int Tech_number = GetInt(message);
@@ -59,25 +54,10 @@ namespace Eminem
 
                 }
                 document.ReplaseTable("@@system_table", tehno_tab, tehnol_tab_header, 3);
-                void pokaz_techno()
-                {
-                    Console.WriteLine("Напоминание, под каким номером какая Информационная система:");
-                    for (int k = 0; k < Tech_number; k++)
-                    {
-
-                        Console.Write("Информационная система № ");
-                        Console.Write(k + 1);
-                        Console.Write(":");
-                        Console.WriteLine(T[k].name);
-
-                    }
-
-                }
-
 
                 Builds A = new Builds();
                 int Count = GetInt("Введите количество зданий: ");
-                document.Replase("Kolzdanii", Convert.ToString(Count));
+                document.Replase("Kolzdanii", Count.ToString());
                 /*
                Console.WriteLine("Введите расстояния между зданиями, через запятую. Например: 400,600:");
                string rofel = Console.ReadLine();
@@ -161,7 +141,9 @@ namespace Eminem
                         A.build[i].floor[i1].dep = new Department[A.build[i].floor[i1].dep_num];
                         for (int i2 = 0; i2 < A.build[i].floor[i1].dep_num; i2++)
                         {
-                            pokaz_techno();
+                            Console.WriteLine("Напоминание, под каким номером какая Информационная система:");
+                            for (int k = 0; k < Tech_number; k++)
+                                Console.WriteLine($"Информационная система № {k + 1}: {T[k].name}");
                             Console.Write($"Введите название отдела № {i2 + 1}  этажа № {i + 1}: ");
                             A.build[i].floor[i1].dep[i2].name = Console.ReadLine();
                             depart_tech[department_count, 0] = A.build[i].floor[i1].dep[i2].name;
