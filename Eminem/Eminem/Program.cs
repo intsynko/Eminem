@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Emionov_root;
-using System.IO;
-using Word = Microsoft.Office.Interop.Word;
-using System.Reflection;
+
+
 
 
 
@@ -16,13 +15,6 @@ namespace Eminem
 
     class Program
     {
-       static  Word.Application application;
-        static Word.Document document;
-        static Object missingObj = System.Reflection.Missing.Value;
-        static Object trueObj = true;
-        static Object falseObj = false;
-        static string FilePatch = Directory.GetCurrentDirectory()+"\\otchet.docx";
-        static string SaveFilePatch = Directory.GetCurrentDirectory()+"\\@otchet";
         static string CabelDlinaFloor;
         static string BetweenZdaniiCabel;
         static int tables_count = 0;
@@ -30,27 +22,21 @@ namespace Eminem
 
         static void Main(string[] args)
         {
-            /*try
-            {*/
+            int itog_dlina_ethernet = 0;
+            int itog_dlina_optovolokno = 0;
+            int itog_dlina_koaks = 0;
+            int cab_can_dlina_itog = 0;
 
-                int itog_dlina_ethernet = 0;
-                int itog_dlina_optovolokno = 0;
-                int itog_dlina_koaks = 0;
-                int cab_can_dlina_itog = 0;
-                
-
-
-                Open_doc();
-
-
+            using(MyDocument document = new MyDocument())
+            {
                 Console.WriteLine("Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант. Например, 901:");
                 int nom_var = Convert.ToInt32(Console.ReadLine());
-                Replase("VariantKurs", Convert.ToString(nom_var));
+                document.Replase("VariantKurs", Convert.ToString(nom_var));
 
                 Console.WriteLine("Введите количество используемых Информационных систем:");
                 int Tech_number = Convert.ToInt32(Console.ReadLine());
                 Technology[] T = new Technology[Tech_number];
-                string[] tehnol_tab_header= new string[3];
+                string[] tehnol_tab_header = new string[3];
                 tehnol_tab_header[0] = "Решаемая задача";
                 tehnol_tab_header[1] = "Информационная система";
                 tehnol_tab_header[2] = "Характер решаемой задачи";
@@ -69,7 +55,7 @@ namespace Eminem
                     T[k].load = Convert.ToInt32(Console.ReadLine());
 
                 }
-                ReplaseTable("@@system_table", tehno_tab, tehnol_tab_header,3);
+                document.ReplaseTable("@@system_table", tehno_tab, tehnol_tab_header, 3);
                 void pokaz_techno()
                 {
                     Console.WriteLine("Напоминание, под каким номером какая Информационная система:");
@@ -89,27 +75,27 @@ namespace Eminem
                 Builds A = new Builds();
                 Console.WriteLine("Введите количество зданий:");
                 int Count = Convert.ToInt32(Console.ReadLine());
-                Replase("Kolzdanii", Convert.ToString(Count));
+                document.Replase("Kolzdanii", Convert.ToString(Count));
                 /*
                Console.WriteLine("Введите расстояния между зданиями, через запятую. Например: 400,600:");
                string rofel = Console.ReadLine();
-               Replase("BetweenBuilds", rofel);
+               document.Replase("BetweenBuilds", rofel);
                Console.WriteLine("Введите количество этажей в зданиях, через запятую. Например: 4,3:");
                string rofel1 = Console.ReadLine();
-               Replase("FloorBuilds", rofel1);
+               document.Replase("FloorBuilds", rofel1);
                Console.WriteLine("Введите площадь этажей в зданиях, через запятую. Например: 400,300:");
                string rofel2 = Console.ReadLine();
-               Replase("FloorSquare", rofel2);
+               document.Replase("FloorSquare", rofel2);
                Console.WriteLine("Введите высоту этажей в зданиях, через запятую. Например: 4,3:");
                string rofel3 = Console.ReadLine();
-               Replase("FloorHeight", rofel3);
+               document.Replase("FloorHeight", rofel3);
 
                Console.WriteLine("Введите количество рабочих по этажам, через запятую. Например: 400 на первом,300 на втором,200 на остальных:");
                string rofel5 = Console.ReadLine();
-               Replase("WorkersFloors", rofel5);
+               document.Replase("WorkersFloors", rofel5);
                Console.WriteLine("Введите количество мобильных станций в помещении. Например, 40:");
                string rofel6 = Console.ReadLine();
-               Replase("MobStations", rofel6);
+               document.Replase("MobStations", rofel6);
                */
 
                 /*
@@ -121,17 +107,17 @@ namespace Eminem
                 string betw_buil = "";
                 for (int z = 0; z < pari; z++)
                 {
-                Console.WriteLine("Введите номер первого из двух связанных зданий");
-                int first_build = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Введите номер второго из двух связанных зданий");
-                int second_build = Convert.ToInt32(Console.ReadLine());
-                Console.WriteLine("Введите расстояние между этими 2 зданиями");
-                int length = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите номер первого из двух связанных зданий");
+                    int first_build = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите номер второго из двух связанных зданий");
+                    int second_build = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine("Введите расстояние между этими 2 зданиями");
+                    int length = Convert.ToInt32(Console.ReadLine());
                     matrix[first_build - 1, second_build - 1] = length;
                     matrix[second_build - 1, first_build - 1] = length;
                     betw_buil += first_build + " - " + second_build + " = " + length + ", ";
                 }
-                Replase("BetweenBuilds", betw_buil);
+                document.Replase("BetweenBuilds", betw_buil);
 
                 string[] depart_tech_haeders = new string[5];
                 depart_tech_haeders[0] = "Название отдела";
@@ -143,7 +129,7 @@ namespace Eminem
                 string[,] depart_tech = new string[department_count + 1, 5];
                 Connect M = new Connect();
                 M.connect_length = matrix;
-                int i,all_workers=0;
+                int i, all_workers = 0;
                 A.build = new Build[Count];
                 string floor_num = "", squre_num = "", hight_num = "", workers_num = "", mob_st_num = "", descr_otd = "", use_eq = "", uninterruptedpower = "";
                 for (i = 0; i < Count; i++)
@@ -223,7 +209,7 @@ namespace Eminem
 
                                 Console.WriteLine("Введите номер Информационной системы, которая используется в отделе:");
                                 A.build[i].floor[i1].dep[i2].tech[i3] = T[Convert.ToInt32(Console.ReadLine()) - 1];
-                                depart_tech[department_count, 2] += A.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; 
+                                depart_tech[department_count, 2] += A.build[i].floor[i1].dep[i2].tech[i3].name + "^P";
                                 A.build[i].floor[i1].dep[i2].tech[i3].user = true;
                                 depart_tech[department_count, 1] += "Пользователь";
                                 Console.WriteLine("Является ли отдел корневым отделом, к которому идут все запросы? Да - '1' Нет - '2': ");
@@ -257,30 +243,30 @@ namespace Eminem
                     workers_num += "^l";
                 }
                 Console.WriteLine("Подождите, идет заполнение документа");
-                ReplaseTable("@@depart_tech", depart_tech, depart_tech_haeders,6);
+                document.ReplaseTable("@@depart_tech", depart_tech, depart_tech_haeders, 6);
                 //вывод в таблицу
-                Replase("FloorsBuilds", floor_num);
-                Replase("FloorSquare", squre_num);
-                Replase("FloorHeight", hight_num);
-                Replase("WorkersFloors", workers_num);
-                Replase("MobStations", mob_st_num);
+                document.Replase("FloorsBuilds", floor_num);
+                document.Replase("FloorSquare", squre_num);
+                document.Replase("FloorHeight", hight_num);
+                document.Replase("WorkersFloors", workers_num);
+                document.Replase("MobStations", mob_st_num);
                 Console.WriteLine("Введите время реакции системы в мс. Например, 400:");
                 string rofel7 = Console.ReadLine();
-                Replase("ReactionTime", rofel7);
-                Replase("WorkersBuilds", all_workers + " ");
+                document.Replase("ReactionTime", rofel7);
+                document.Replase("WorkersBuilds", all_workers + " ");
 
-                Replase("@@Otdel", descr_otd);// заполняем описания отделов
+                document.Replase("@@Otdel", descr_otd);// заполняем описания отделов
                 int load_num = 0;
 
                 Method.build_load_calculation(ref A);
                 for (int v = 0; v < A.load.Length; v++)
                 {
                     load_num += A.load[v];
-                    Console.WriteLine("Предполагаемая нагрузка внутри здания № " + (v+1) + " =" + A.load[v]);
+                    Console.WriteLine("Предполагаемая нагрузка внутри здания № " + (v + 1) + " =" + A.load[v]);
                     if (A.load[v] < 1000)
                     {
                         A.build[v].cabel_type = "ethernet";
-                        Console.WriteLine("В здании № " + (v+1) + " предполагается использование кабеля ethernet");
+                        Console.WriteLine("В здании № " + (v + 1) + " предполагается использование кабеля ethernet");
 
                         if (A.build[v].height * A.build[v].floor_num > 100)
                             Console.WriteLine("Требуется применение дополнительных устройств усиления для вертикальных кабелей");
@@ -305,7 +291,7 @@ namespace Eminem
 
                 }
 
-                Replase("ItogTrafik", Convert.ToString(load_num));
+                document.Replase("ItogTrafik", Convert.ToString(load_num));
 
                 Method.connect_load_calculation(ref M, A);
                 M.connect_type = new string[M.connect_load.GetLength(0), M.connect_load.GetLength(0)];
@@ -317,7 +303,7 @@ namespace Eminem
                         if (M.connect_load[v, f] != 0)
                         {
 
-                            Console.WriteLine("Предполагаемая нагрузка между зданиями № " + (v + 1) + " и " + (f+1) + "= " + M.connect_load[v, f]+ " Расстояние = " +M.connect_length[v,f]);
+                            Console.WriteLine("Предполагаемая нагрузка между зданиями № " + (v + 1) + " и " + (f + 1) + "= " + M.connect_load[v, f] + " Расстояние = " + M.connect_length[v, f]);
                             if (M.connect_load[v, f] < 1000 && M.connect_length[v, f] < 100)
                             {
                                 check = true;
@@ -338,7 +324,7 @@ namespace Eminem
                             }
                             if (!check)
                                 Console.WriteLine("Необходимо использовать промежуточную инфраструктурy: \n 0 - ethernet, 1 - оптоволокно 2 - коаксиальный ");
-                            
+
                             Console.WriteLine("Необходимо выбрать используемую технологию кабельного соединения ");
                             switch (Console.ReadLine())
                             {
@@ -371,7 +357,7 @@ namespace Eminem
                         }
                     }
                 //Console.ReadKey();
-                Replase("@@CabelBetweenBuilds", BetweenZdaniiCabel);
+                document.Replase("@@CabelBetweenBuilds", BetweenZdaniiCabel);
                 for (i = 0; i < Count; i++)
 
                 {
@@ -419,14 +405,14 @@ namespace Eminem
 
 
                 }
-                Replase("CabelLengthFloor", use_eq);
-                Replase("CabelLengthMax", "(" + (itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) + "/305)=" + (Convert.ToInt32((itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) / 305)));
+                document.Replase("CabelLengthFloor", use_eq);
+                document.Replase("CabelLengthMax", "(" + (itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) + "/305)=" + (Convert.ToInt32((itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) / 305)));
                 Console.WriteLine("\n\nИтоговая длина ethernet кабелей в системе =" + itog_dlina_ethernet);
                 Console.WriteLine("Итоговая длина оптоволоконных кабелей в системе =" + itog_dlina_optovolokno);
                 Console.WriteLine("Итоговая длина коаксиальных кабелей в системе =" + itog_dlina_koaks);
                 Console.WriteLine("Итоговая длина кабель-каналов в системе =" + cab_can_dlina_itog);
-                Replase("@@CabKan", cab_can_dlina_itog + "метров");
-                Replase("@@uninterruptedpower", uninterruptedpower);
+                document.Replase("@@CabKan", cab_can_dlina_itog + "метров");
+                document.Replase("@@uninterruptedpower", uninterruptedpower);
                 Console.WriteLine("Нажмите Enter чтобы продолжить");
                 Console.ReadLine();
                 string use_tech = "";
@@ -436,165 +422,24 @@ namespace Eminem
                     use_tech += "Gigabit Ethernet 10 Base-5, основанный на коаксиальном кабельном соединении, ";
                 if (itog_dlina_optovolokno != 0)
                     use_tech += "Gigabit Ethernet 1000 Base-LX, использующий одномодовое волокно, ";
-                IP[] ip =  Method.IP_ret(A);
+                IP[] ip = Method.IP_ret(A);
                 string[] ip_table_header = new string[3];
                 ip_table_header[0] = "Номер здания";
                 ip_table_header[1] = "Назначение";
                 ip_table_header[2] = "Диапазон ip";
-                string[,] ip_table = new string[ip.Length, 3]; 
+                string[,] ip_table = new string[ip.Length, 3];
                 for (int z = 0; z < ip.Length; z++)
                 {
-                    ip_table[z, 0] = ip[z].build_num+"";
+                    ip_table[z, 0] = ip[z].build_num + "";
                     ip_table[z, 1] = ip[z].dep_name;
                     ip_table[z, 2] = ip[z].adress_start + "-" + ip[z].adress_end;
                 }
-                ReplaseTable("@@IP", ip_table, ip_table_header,7);
-                Replase("@@techolog", use_tech);
-                Replase("@@ equipment", use_eq);
-                CloseDoc();
-            //}
-           /* catch
-            {
-                //Console.WriteLine("Произошла ошибка");
-                //CloseDoc();
-            }*/
-          
+                document.ReplaseTable("@@IP", ip_table, ip_table_header, 7);
+                document.Replase("@@techolog", use_tech);
+                document.Replase("@@ equipment", use_eq);
+            }
             Console.Read();
         }
-        static void Open_doc()
-        {
-            //создаем обьект приложения word
-            application = new Word.Application();
-            // создаем путь к файлу
-            Object templatePathObj = FilePatch; ;
-
-            // если вылетим не этом этапе, приложение останется открытым
-            try
-            {
-                document = application.Documents.Add(ref templatePathObj, ref missingObj, ref missingObj, ref missingObj);
-            }
-            catch (Exception error)
-            {
-                document.Close(ref falseObj, ref missingObj, ref missingObj);
-                application.Quit(ref missingObj, ref missingObj, ref missingObj);
-                document = null;
-                application = null;
-                throw error;
-            }
-            application.Visible = true;
-
-        }
-        static void Replase(string strToFind, string replaceStr)
-        {
-            // обьектные строки для Word
-            object strToFindObj = strToFind;
-            object replaceStrObj = replaceStr;
-            // диапазон документа Word
-            Word.Range wordRange;
-            //тип поиска и замены
-            object replaceTypeObj;
-            replaceTypeObj = Word.WdReplace.wdReplaceAll;
-            int z = 0;
-            while (replaceStr.Length > 0)
-            // обходим все разделы документа
-            {
-                bool ch = false;
-                if (255 - strToFind.Length > replaceStr.Length)
-                    z = replaceStr.Length;
-                else
-                { z = 255 - strToFind.Length; ch = true; }
-                string buf = string.Copy(replaceStr);
-
-                if (ch)
-                { buf += strToFind;buf= buf.Remove(z + 1); }
-                    replaceStrObj = buf;
-                for (int i = 1; i <= document.Sections.Count; i++)
-                {
-
-                    // берем всю секцию диапазоном
-                    wordRange = document.Sections[i].Range;
-
-                    Word.Find wordFindObj = wordRange.Find;
-
-                    
-                    object[] wordFindParameters = new object[15] { strToFindObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, replaceStrObj, replaceTypeObj, missingObj, missingObj, missingObj, missingObj };
-
-                   
-                    wordFindObj.GetType().InvokeMember("Execute", BindingFlags.InvokeMethod, null, wordFindObj, wordFindParameters);
-
-                }
-                replaceStr = replaceStr.Remove(0, z);
-            }
-            Object pathToSaveObj = SaveFilePatch;
-            document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj);
-
-        }
-        static void ReplaseTable(string strToFind, string[,] replaceStr, string[] headers,int tab_num)
-        {
-            // обьектные строки для Word
-            object strToFindObj = strToFind;
-            object replaceStrObj = replaceStr;
-            // диапазон документа Word
-            Word.Range wordRange;
-            //тип поиска и замены
-            object replaceTypeObj;
-            replaceTypeObj = Word.WdReplace.wdReplaceAll;
-            // обходим все разделы документа
-            //for (int i = 1; i <= document.Sections.Count; i++)
-            {
-
-                // берем всю секцию диапазоном
-                wordRange = document.Range();
-                Word.Range buf_range;
-                Word.Table table = document.Tables[tab_num];
-                for (int rows = 0; rows < replaceStr.GetLength(0); rows++)
-                    table.Rows.Add();
-                for (int col = 0; col < replaceStr.GetLength(1); col++)
-                {
-                    for (int rows = 0; rows < replaceStr.GetLength(0); rows++)
-                    {
-                        buf_range = table.Cell(rows+2, col+1).Range;
-                        string buf = replaceStr[rows, col];
-                        buf_range.Text = buf;
-                    }
-                }
-
-                /*
-                Word.Find wordFindObj = wordRange.Find;
-               // Word.Table table = document.Tables[tables_count];
-               // tables_count++;
-                Word.Range buf_range;
-                Word.Table table = new Word.Table;
-                for(int col=0;i< replaceStr.GetLength(0); i++)
-                    table.Columns.Add();
-                for (int rows = 0; i < replaceStr.GetLength(1)+1; i++)
-                    table.Rows.Add();
-                for (int col = 0; i < replaceStr.GetLength(0); i++)
-                {
-                    buf_range = table.Cell(col, 1).Range;
-                    buf_range.Text = headers[col];
-                    for (int rows = 1; i < replaceStr.GetLength(1); i++)
-                    {
-                        buf_range = table.Cell(col, rows).Range;
-                        buf_range.Text = replaceStr[rows,col];
-                    }
-                }
-                object[] wordFindParameters = new object[15] { strToFindObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, table, replaceTypeObj, missingObj, missingObj, missingObj, missingObj };
-                wordFindObj.GetType().InvokeMember("Execute", BindingFlags.InvokeMethod, null, wordFindObj, wordFindParameters);
-*/
-            }
-            Object pathToSaveObj = SaveFilePatch;
-            document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj);
-
-        }
-
-        static void CloseDoc()
-        {
-            document.Close(ref falseObj, ref missingObj, ref missingObj);
-            application.Quit(ref missingObj, ref missingObj, ref missingObj);
-        }
-
-
     }
 
 }
