@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Word = Microsoft.Office.Interop.Word;
 using System.Reflection;
 using System.IO;
+using System.Diagnostics;
 
 namespace Eminem
 {
@@ -16,12 +17,21 @@ namespace Eminem
         private Object missingObj = System.Reflection.Missing.Value;
         private Object trueObj = true;
         private Object falseObj = false;
-        private string FilePatch = Directory.GetCurrentDirectory() + "\\otchet.docx";
-        private string SaveFilePatch = Directory.GetCurrentDirectory() + "\\@otchet";
+        
+        private string FilePatch;
+        private string SaveFilePatch;
         public bool Visible { get { return application.Visible; } set { application.Visible = value; } }
 
-        public MyDocument()
+        public MyDocument(bool killAllProcesses)
         {
+            string current_dir = Directory.GetCurrentDirectory();
+            string main_folder = Directory.GetParent(current_dir).Parent.Parent.Parent.FullName;
+            FilePatch = main_folder + "\\Patterns\\pattern.docx";
+            SaveFilePatch = main_folder + "\\Patterns\\result.doc";
+            if (!File.Exists(FilePatch))
+                throw new Exception($"Не найден шаблон заполнение отчета по пути: {FilePatch}");
+            if (killAllProcesses)
+                KillAllWordProcesses();
             Open_doc();
         }
         public void Dispose()
@@ -33,7 +43,7 @@ namespace Eminem
             //создаем обьект приложения word
             application = new Word.Application();
             // создаем путь к файлу
-            Object templatePathObj = FilePatch; ;
+            Object templatePathObj = FilePatch;
 
             // если вылетим не этом этапе, приложение останется открытым
             try
@@ -46,18 +56,17 @@ namespace Eminem
                     $"Ошибка доступа. Откройте шаблонный документ и разрешите редактирование. " +
                     $"Шаблонный документ нах-ся по адресу: {templatePathObj}"
                 );
+                throw ex;
             }
-            catch (Exception error)
+            catch (Exception ex)
             {
                 if (document != null)
                     document.Close(ref falseObj, ref missingObj, ref missingObj);
                 application.Quit(ref missingObj, ref missingObj, ref missingObj);
                 document = null;
                 application = null;
-                throw error;
+                throw ex;
             }
-            application.Visible = false;
-
         }
         public void Replase(string strToFind, string replaceStr)
         {
@@ -162,8 +171,21 @@ namespace Eminem
             document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj);
 
         }
+        private void KillAllWordProcesses()
+        {
+            if (Process.GetProcessesByName("winword").Count() > 0)
+            {
+                System.Diagnostics.Process[] aProcWrd = System.Diagnostics.Process.GetProcessesByName("WINWORD");
+
+                foreach (System.Diagnostics.Process oProc in aProcWrd)
+                {
+                    oProc.Kill();
+                }
+            }
+        }
         private void CloseDoc()
         {
+            Console.WriteLine("Закрываю документ");
             if (document != null)
                 document.Close(ref falseObj, ref missingObj, ref missingObj);
             if (application != null)

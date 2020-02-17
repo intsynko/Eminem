@@ -16,7 +16,7 @@ namespace Eminem
     class Program
     {
         static string CabelDlinaFloor;
-        static string BetweenZdaniiCabel;
+        static string BetweenZdaniiCabel = "Нет необходимости соединения зданий";
 
 
         static void Main(string[] args)
@@ -26,17 +26,21 @@ namespace Eminem
             int itog_dlina_koaks = 0;
             int cab_can_dlina_itog = 0;
 
+            Console.Write("Осторожно! Убивает все открытые процессы ворда при запуске.\nДля продолжения нажмите ENTER:");
+            Console.ReadLine();
+
             // контекстный менеджер, правильно закроет файл, если во время блока произойдет какая нибудь фигня (исключение)
-            using (MyDocument document = new MyDocument {Visible = false})
+            using (MyDocument document = new MyDocument(true) {Visible = false})
             {
                 //ToDo поменять все читания инта с консоли на метод GetInt
                 //ToDo поменять все каскады Console.WriteLine(...) на интерполяию
+                //ToDo вообще применить интерполяцию там, где это возможно
 
-                string message = "Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант. Например, 901";
+                string message = "Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант.\n Например, 901: ";
                 int nom_var = GetInt(message);
                 document.Replase("VariantKurs", Convert.ToString(nom_var));
 
-                message = "Введите количество используемых Информационных систем:";
+                message = "Введите количество используемых Информационных систем: ";
                 int Tech_number = GetInt(message);
                 Technology[] T = new Technology[Tech_number];
                 string[] tehnol_tab_header = new string[3];
@@ -47,10 +51,10 @@ namespace Eminem
                 for (int k = 0; k < Tech_number; k++)
                 {
 
-                    Console.Write($"Введите название Информационной системы № {k+1}:");
+                    Console.Write($"Введите название Информационной системы № {k+1}: ");
                     T[k].name = Console.ReadLine();
                     tehno_tab[k, 1] = T[k].name;
-                    message = $"Введите количество трафика Информационной системы в мб/с от пользователя (только целое число) {T[k].name}:";
+                    message = $"Введите количество трафика Информационной системы в мб/с от пользователя (только целое число) {T[k].name}: ";
                     T[k].load = GetInt(message);
 
                 }
@@ -72,7 +76,7 @@ namespace Eminem
 
 
                 Builds A = new Builds();
-                int Count = GetInt("Введите количество зданий:");
+                int Count = GetInt("Введите количество зданий: ");
                 document.Replase("Kolzdanii", Convert.ToString(Count));
                 /*
                Console.WriteLine("Введите расстояния между зданиями, через запятую. Например: 400,600:");
@@ -99,18 +103,24 @@ namespace Eminem
                 /*
 
                */
+
                 int[,] matrix = new int[Count, Count];
-                int pari = GetInt("Сколько существует пар зданий связанных? ");
-                string betw_buil = "";
-                for (int z = 0; z < pari; z++)
+                string betw_buil = "-";
+                // если имеется больше одного здания
+                if (Count > 1)
                 {
-                    int first_build = GetInt("Введите номер первого из двух связанных зданий: ");
-                    int second_build = GetInt("Введите номер второго из двух связанных зданий: ");
-                    int length = GetInt("Введите расстояние между этими 2 зданиями");
-                    matrix[first_build - 1, second_build - 1] = length;
-                    matrix[second_build - 1, first_build - 1] = length;
-                    betw_buil += first_build + " - " + second_build + " = " + length + ", ";
+                    int pari = GetInt("Сколько существует пар зданий связанных: ");
+                    for (int z = 0; z < pari; z++)
+                    {
+                        int first_build = GetInt("Введите номер первого из двух связанных зданий: ");
+                        int second_build = GetInt("Введите номер второго из двух связанных зданий: ");
+                        int length = GetInt("Введите расстояние между этими 2 зданиями: ");
+                        matrix[first_build - 1, second_build - 1] = length;
+                        matrix[second_build - 1, first_build - 1] = length;
+                        betw_buil += first_build + " - " + second_build + " = " + length + ", ";
+                    }
                 }
+
                 document.Replase("BetweenBuilds", betw_buil);
 
                 string[] depart_tech_haeders = new string[5];
@@ -128,28 +138,15 @@ namespace Eminem
                 string floor_num = "", squre_num = "", hight_num = "", workers_num = "", mob_st_num = "", descr_otd = "", use_eq = "", uninterruptedpower = "";
                 for (i = 0; i < Count; i++)
                 {
-                    descr_otd += "^p В здании №" + i + "находятся: ";
+                    descr_otd += " В здании №" + i + "находятся: ";
                     A.build[i] = new Build();
-                    Console.Write("Введите количество этажей здания № ");
-                    Console.Write(i + 1);
-                    Console.WriteLine(":");
-                    A.build[i].floor_num = Convert.ToInt32(Console.ReadLine());
+                    A.build[i].floor_num = GetInt($"Введите количество этажей здания №{i + 1}: ");
                     floor_num += A.build[i].floor_num + ",";
-                    Console.Write("Введите площадь этажа здания № ");
-                    Console.Write(i + 1);
-                    Console.WriteLine(":");
-                    A.build[i].square = Convert.ToInt32(Console.ReadLine());
+                    A.build[i].square = GetInt($"Введите площадь этажа здания №{i + 1}: ");
                     squre_num += A.build[i].square + ",";
-                    Console.Write("Введите высоту этажа здания № ");
-                    Console.Write(i + 1);
-                    Console.WriteLine(":");
-                    A.build[i].height = Convert.ToInt32(Console.ReadLine());
+                    A.build[i].height = GetInt($"Введите высоту этажа здания №{i + 1}: ");
                     hight_num += A.build[i].height;
-                    Console.Write("Введите количество мобильных станций ");
-                    Console.Write(" Здания № ");
-                    Console.Write(i + 1);
-                    Console.WriteLine(":");
-                    int mob_st = Convert.ToInt32(Console.ReadLine());
+                    int mob_st = GetInt($"Введите количество мобильных станций здания №{i + 1}: ");
                     mob_st_num += mob_st + ",";
                     workers_num += i + " ";
 
@@ -160,44 +157,27 @@ namespace Eminem
                         int workers = 0;
                         A.build[i].floor[i1] = new Floor();
                         A.build[i].floor[i1].Mob_st = mob_st;
-                        Console.Write("Введите количество отделов этажа № ");
-                        Console.Write(i1 + 1);
-                        Console.Write(" Здания № ");
-                        Console.Write(i + 1);
-                        Console.WriteLine(":");
-                        A.build[i].floor[i1].dep_num = Convert.ToInt32(Console.ReadLine());
+                        A.build[i].floor[i1].dep_num = GetInt($"Введите количество отделов этажа № {i1 + 1}  Здания № {i + 1}: ");
                         A.build[i].floor[i1].dep = new Department[A.build[i].floor[i1].dep_num];
                         for (int i2 = 0; i2 < A.build[i].floor[i1].dep_num; i2++)
                         {
                             pokaz_techno();
-                            Console.Write($"Введите название отдела № {i2 + 1}  этажа № {i + 1}:");
+                            Console.Write($"Введите название отдела № {i2 + 1}  этажа № {i + 1}: ");
                             A.build[i].floor[i1].dep[i2].name = Console.ReadLine();
                             depart_tech[department_count, 0] = A.build[i].floor[i1].dep[i2].name;
-                            Console.Write("Введите количество работников отдела № ");
-                            Console.Write(i2 + 1);
-                            Console.Write(" этажа № ");
-                            Console.Write(i1 + 1);
-                            Console.Write(" здания № ");
-                            Console.Write(i + 1);
-                            Console.WriteLine(":");
-                            A.build[i].floor[i1].dep[i2].workers = Convert.ToInt32(Console.ReadLine());
+                            message = $"Введите количество работников отдела № {i2 + 1}  этажа № {i1 + 1} здания № {i + 1}:" ;
+                            A.build[i].floor[i1].dep[i2].workers = GetInt(message);
                             workers += A.build[i].floor[i1].dep[i2].workers;
                             all_workers += A.build[i].floor[i1].dep[i2].workers;
-                            Console.Write("Введите количество используемых Информационных систем отдела № ");
-                            Console.Write(i2 + 1);
-                            Console.Write(" этажа № ");
-                            Console.Write(i1 + 1);
-                            Console.Write(" здания № ");
-                            Console.Write(i + 1);
-                            Console.WriteLine(":");
-                            A.build[i].floor[i1].dep[i2].techno_count = Convert.ToInt32(Console.ReadLine());
+                            message = $"Введите количество используемых Информационных систем отдела № {i2 + 1}  этажа № {i1 + 1} здания № {i + 1}: ";
+                            A.build[i].floor[i1].dep[i2].techno_count = GetInt(message);
                             A.build[i].floor[i1].dep[i2].tech = new Technology[A.build[i].floor[i1].dep[i2].techno_count];
                             for (int i3 = 0; i3 < A.build[i].floor[i1].dep[i2].techno_count; i3++)
                             {
 
-                                Console.WriteLine("Введите номер Информационной системы, которая используется в отделе:");
-                                A.build[i].floor[i1].dep[i2].tech[i3] = T[Convert.ToInt32(Console.ReadLine()) - 1];
-                                depart_tech[department_count, 2] += A.build[i].floor[i1].dep[i2].tech[i3].name + "^P";
+                                message = "Введите номер Информационной системы, которая используется в отделе: ";
+                                A.build[i].floor[i1].dep[i2].tech[i3] = T[GetInt(message) - 1];
+                                depart_tech[department_count, 2] += A.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
                                 A.build[i].floor[i1].dep[i2].tech[i3].user = true;
                                 depart_tech[department_count, 1] += "Пользователь";
                                 Console.WriteLine("Является ли отдел корневым отделом, к которому идут все запросы? Да - '1' Нет - '2': ");
@@ -313,14 +293,14 @@ namespace Eminem
                             if (!check)
                                 Console.WriteLine("Необходимо использовать промежуточную инфраструктурy: \n 0 - ethernet, 1 - оптоволокно 2 - коаксиальный ");
 
-                            Console.WriteLine("Необходимо выбрать используемую технологию кабельного соединения ");
+                            Console.WriteLine("Необходимо выбрать используемую технологию кабельного соединения: ");
                             switch (Console.ReadLine())
                             {
                                 case "0":
                                     {
                                         M.connect_type[v, f] = "ethernet";
                                         M.connect_type[f, v] = "ethernet";
-                                        BetweenZdaniiCabel += "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель ethernet^l";
+                                        BetweenZdaniiCabel = "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель ethernet^l";
                                         itog_dlina_ethernet += M.connect_length[v, f];
                                     }
                                     break;
@@ -329,7 +309,7 @@ namespace Eminem
                                         M.connect_type[v, f] = "Оптоволокно";
                                         M.connect_type[f, v] = "Оптоволокно";
                                         itog_dlina_optovolokno += M.connect_length[v, f];
-                                        BetweenZdaniiCabel += "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель кабеля^l";
+                                        BetweenZdaniiCabel = "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель кабеля^l";
 
                                     }
                                     break;
@@ -338,14 +318,15 @@ namespace Eminem
                                         M.connect_type[v, f] = "коаксиальный";
                                         M.connect_type[f, v] = "коаксиальный";
                                         itog_dlina_koaks += M.connect_length[v, f];
-                                        BetweenZdaniiCabel += "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель кабеля^l";
+                                        BetweenZdaniiCabel = "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель кабеля^l";
                                     }
                                     break;
                             }
+                            document.Replase("@@CabelBetweenBuilds", BetweenZdaniiCabel);
                         }
                     }
                 //Console.ReadKey();
-                document.Replase("@@CabelBetweenBuilds", BetweenZdaniiCabel);
+                
                 for (i = 0; i < Count; i++)
 
                 {
@@ -394,7 +375,7 @@ namespace Eminem
 
                 }
                 document.Replase("CabelLengthFloor", use_eq);
-                document.Replase("CabelLengthMax", "(" + (itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) + "/305)=" + (Convert.ToInt32((itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) / 305)));
+                document.Replase("CabelLengthMax", "(" + (itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) + "/305)=" + (int)((itog_dlina_ethernet + itog_dlina_koaks + itog_dlina_optovolokno) / 305));
                 Console.WriteLine("\n\nИтоговая длина ethernet кабелей в системе =" + itog_dlina_ethernet);
                 Console.WriteLine("Итоговая длина оптоволоконных кабелей в системе =" + itog_dlina_optovolokno);
                 Console.WriteLine("Итоговая длина коаксиальных кабелей в системе =" + itog_dlina_koaks);
