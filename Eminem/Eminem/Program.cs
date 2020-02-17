@@ -17,7 +17,6 @@ namespace Eminem
     {
         static string CabelDlinaFloor;
         static string BetweenZdaniiCabel;
-        static int tables_count = 0;
 
 
         static void Main(string[] args)
@@ -27,14 +26,18 @@ namespace Eminem
             int itog_dlina_koaks = 0;
             int cab_can_dlina_itog = 0;
 
-            using(MyDocument document = new MyDocument())
+            // контекстный менеджер, правильно закроет файл, если во время блока произойдет какая нибудь фигня (исключение)
+            using (MyDocument document = new MyDocument {Visible = false})
             {
-                Console.WriteLine("Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант. Например, 901:");
-                int nom_var = Convert.ToInt32(Console.ReadLine());
+                //ToDo поменять все читания инта с консоли на метод GetInt
+                //ToDo поменять все каскады Console.WriteLine(...) на интерполяию
+
+                string message = "Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант. Например, 901";
+                int nom_var = GetInt(message);
                 document.Replase("VariantKurs", Convert.ToString(nom_var));
 
-                Console.WriteLine("Введите количество используемых Информационных систем:");
-                int Tech_number = Convert.ToInt32(Console.ReadLine());
+                message = "Введите количество используемых Информационных систем:";
+                int Tech_number = GetInt(message);
                 Technology[] T = new Technology[Tech_number];
                 string[] tehnol_tab_header = new string[3];
                 tehnol_tab_header[0] = "Решаемая задача";
@@ -44,15 +47,11 @@ namespace Eminem
                 for (int k = 0; k < Tech_number; k++)
                 {
 
-                    Console.Write("Введите название Информационной системы № ");
-                    Console.Write(k + 1);
-                    Console.WriteLine(":");
+                    Console.Write($"Введите название Информационной системы № {k+1}:");
                     T[k].name = Console.ReadLine();
                     tehno_tab[k, 1] = T[k].name;
-                    Console.Write("Введите количество трафика Информационной системы в мб/с от пользователя (только целое число) ");
-                    Console.Write(T[k].name);
-                    Console.WriteLine(":");
-                    T[k].load = Convert.ToInt32(Console.ReadLine());
+                    message = $"Введите количество трафика Информационной системы в мб/с от пользователя (только целое число) {T[k].name}:";
+                    T[k].load = GetInt(message);
 
                 }
                 document.ReplaseTable("@@system_table", tehno_tab, tehnol_tab_header, 3);
@@ -73,8 +72,7 @@ namespace Eminem
 
 
                 Builds A = new Builds();
-                Console.WriteLine("Введите количество зданий:");
-                int Count = Convert.ToInt32(Console.ReadLine());
+                int Count = GetInt("Введите количество зданий:");
                 document.Replase("Kolzdanii", Convert.ToString(Count));
                 /*
                Console.WriteLine("Введите расстояния между зданиями, через запятую. Например: 400,600:");
@@ -102,17 +100,13 @@ namespace Eminem
 
                */
                 int[,] matrix = new int[Count, Count];
-                Console.WriteLine("Сколько существует пар зданий связанных? ");
-                int pari = Convert.ToInt32(Console.ReadLine());
+                int pari = GetInt("Сколько существует пар зданий связанных? ");
                 string betw_buil = "";
                 for (int z = 0; z < pari; z++)
                 {
-                    Console.WriteLine("Введите номер первого из двух связанных зданий");
-                    int first_build = Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("Введите номер второго из двух связанных зданий");
-                    int second_build = Convert.ToInt32(Console.ReadLine());
-                    Console.WriteLine("Введите расстояние между этими 2 зданиями");
-                    int length = Convert.ToInt32(Console.ReadLine());
+                    int first_build = GetInt("Введите номер первого из двух связанных зданий: ");
+                    int second_build = GetInt("Введите номер второго из двух связанных зданий: ");
+                    int length = GetInt("Введите расстояние между этими 2 зданиями");
                     matrix[first_build - 1, second_build - 1] = length;
                     matrix[second_build - 1, first_build - 1] = length;
                     betw_buil += first_build + " - " + second_build + " = " + length + ", ";
@@ -176,13 +170,7 @@ namespace Eminem
                         for (int i2 = 0; i2 < A.build[i].floor[i1].dep_num; i2++)
                         {
                             pokaz_techno();
-                            Console.Write("Введите название отдела № ");
-                            Console.Write(i2 + 1);
-                            Console.Write(" этажа № ");
-                            Console.Write(i1 + 1);
-                            Console.Write(" здания № ");
-                            Console.Write(i + 1);
-                            Console.WriteLine(":");
+                            Console.Write($"Введите название отдела № {i2 + 1}  этажа № {i + 1}:");
                             A.build[i].floor[i1].dep[i2].name = Console.ReadLine();
                             depart_tech[department_count, 0] = A.build[i].floor[i1].dep[i2].name;
                             Console.Write("Введите количество работников отдела № ");
@@ -439,6 +427,30 @@ namespace Eminem
                 document.Replase("@@ equipment", use_eq);
             }
             Console.Read();
+        }
+
+
+        /// <summary>
+        /// Запрошивает у пользователя число в формате int, пока не введет в верном формате
+        /// </summary>
+        /// <param name="message">Сообщеине, которое спросят у пользователя в коносли</param>
+        /// <returns></returns>
+        static int GetInt(string message)
+        {   
+            while(true)
+            {
+                try
+                {
+                    Console.Write(message);
+                    int num = Convert.ToInt32(Console.ReadLine());
+                    return num;
+                }
+                catch
+                {
+                    Console.WriteLine("Вы некорректно ввели число.");
+                }
+            }
+            
         }
     }
 

@@ -18,6 +18,7 @@ namespace Eminem
         private Object falseObj = false;
         private string FilePatch = Directory.GetCurrentDirectory() + "\\otchet.docx";
         private string SaveFilePatch = Directory.GetCurrentDirectory() + "\\@otchet";
+        public bool Visible { get { return application.Visible; } set { application.Visible = value; } }
 
         public MyDocument()
         {
