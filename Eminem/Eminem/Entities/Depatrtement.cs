@@ -42,19 +42,13 @@ namespace Eminem.Entities
         }
         public int GetSwitchSpeed()
         {
-            int sum = 0;
-            foreach(Tuple < InformationSystem, InformationSystemSettings > system in InformationSystemList)
-            {
-                if (system.Item1.Root == this)
-                    sum += system.Item1.Traffic * system.Item1.GetClientsCount();
-                else
-                {
-                    sum += StaffCount * system.Item1.Traffic;
-                    if (system.Item2.IsRemoteServer)
-                        sum += StaffCount * system.Item1.Traffic;
-                }
-            }
-            return sum;
+            return InformationSystemList.Sum(
+                system => (
+                    system.Item1.Root == this ? // если этот отдел корневой
+                    system.Item1.Traffic * system.Item1.GetClientsCount() : // считаем всех пользователей системы
+                    StaffCount * system.Item1.Traffic // иначе считаем только сотрудников этого отдела
+                )
+           );
         }
     }
 

@@ -96,80 +96,51 @@ namespace Emionov_root
 
         public static void build_load_calculation(ref Builds builds)
         {
-            //foreach(var build in  builds.build)
-            //{
-            //    foreach(var floor in build.floor)
-            //    {
-            //        floor.dep_num = 3;
-            //    }
-            //}
-
-            var queryGroupMax = builds.build.Sum(
-                b => b.floor.Sum(
-                    f => f.dep.Where(
-                        d => d.tech.Where(t=>t.root).Select(t=>t.name).Contains("name")
-                    ).Sum(d => d.workers)
-                )
-            );
-
-
             // ToDo переделать все это на методы классов
-            int i = 0;
-            builds.load = new int[builds.build.Length]; //создаем массив с нагрузками на здания
-            while (builds.build.Length > i)
+
+            //создаем массив с нагрузками на здания
+            builds.load = new int[builds.build.Length]; 
+            for (int i=0; i < builds.build.Length; i++)
             {
-                int fl = 0;
-                int de = 0;
-                int te = 0;
-                while (builds.build[i].floor.Length > fl)
+                for (int fl=0; fl <  builds.build[i].floor.Length; fl++)
                 {
-                    while (builds.build[i].floor[fl].dep.Length > de)
+                    for (int de = 0; de < builds.build[i].floor[fl].dep.Length; de++)
                     {
-                        while (builds.build[i].floor[fl].dep[de].tech.Length > te)
+                        for (int te=0; te < builds.build[i].floor[fl].dep[de].tech.Length; te++)
                         {
+                            // если это корневой отдел
                             if (builds.build[i].floor[fl].dep[de].tech[te].root)
                             {
-                                int z = 0, x = 0, c = 0, v = 0, client = 0;
-                                while (builds.build.Length > z)//считаем кол-во клиентов технологии
-                                {
-                                    while (builds.build[z].floor.Length > x)
-                                    {
-                                        while (builds.build[z].floor[x].dep.Length > c)
-                                        {
-                                            while (builds.build[z].floor[x].dep[c].tech.Length > v)
-                                            {
-                                                // если технологии совпадают и есть юзер
-                                                if (builds.build[i].floor[fl].dep[de].tech[te].name.Equals(builds.build[z].floor[x].dep[c].tech[v].name)&& builds.build[z].floor[x].dep[c].tech[v].user)
-                                                    client += builds.build[z].floor[x].dep[c].workers;//подсчет клиентов технологии
-                                                v++;
-
-                                            }
-                                            c++;
-                                        }
-                                        x++;
-                                    }
-                                    z++;
-                                }
-                                builds.load[i] += client * builds.build[i].floor[fl].dep[de].tech[te].load;//считаю нагрузку на сервера
+                                // считаем всех пользователей этой ИС
+                                string name_to_find = builds.build[i].floor[fl].dep[de].tech[te].name;
+                                int client = builds.build.Sum(
+                                    b => b.floor.Sum(
+                                        f => f.dep.Where(
+                                            d => d.tech.Select(t => t.name).Contains(name_to_find)
+                                        ).Sum(d => d.workers)
+                                    )
+                                );
+                                //считаю нагрузку на сервера
+                                builds.load[i] += client * builds.build[i].floor[fl].dep[de].tech[te].load;
                                 builds.build[i].floor[fl].fl_req.swch_speed+= client * builds.build[i].floor[fl].dep[de].tech[te].load;
                             }
+                            // если отдел использует эту ИС
                             if(builds.build[i].floor[fl].dep[de].tech[te].user)
                             {
-                                builds.load[i] += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;//считаю нагрузку клиентов
+                                //считаю нагрузку клиентов
+                                builds.load[i] += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
                                 builds.build[i].floor[fl].fl_req.swch_speed += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
                             }
+                            // если отдел 
                             if (builds.build[i].floor[fl].dep[de].tech[te].rem_serv)
                             {
                                 builds.load[i] += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
                                 builds.build[i].floor[fl].fl_req.swch_speed += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
                             }
-                            te++;
                         }
-                        de++;
 
-                    }fl++;
-                }i++;
-                
+                    }
+                }
             }
         }
         public static void connect_load_calculation(ref Connect connect, Builds builds)
@@ -199,7 +170,13 @@ namespace Emionov_root
                                             {
                                                 if (builds.build[i].floor[fl].dep[de].tech[te].name.Equals(builds.build[z].floor[x].dep[c].tech[v].name) && builds.build[z].floor[x].dep[c].tech[v].root)
                                                 {
-                                                    if (!load_to_way(ref connect, connect.connect_length, i, z, builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[i].floor[fl].dep[de].workers))//записать в путь нагрузку
+                                                    //записать в путь нагрузку
+                                                    if (!load_to_way(
+                                                            ref connect,
+                                                            i,
+                                                            z,
+                                                            builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[i].floor[fl].dep[de].workers
+                                                    ))
                                                         throw new Exception("путь не найден");
                                                 }
                                                 v++;
@@ -224,7 +201,13 @@ namespace Emionov_root
                                             {
                                                 if (builds.build[i].floor[fl].dep[de].tech[te].name.Equals(builds.build[z].floor[x].dep[c].tech[v].name) && builds.build[z].floor[x].dep[c].tech[v].user)
                                                 {
-                                                    if (!load_to_way(ref connect, connect.connect_length, i, z, builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[z].floor[x].dep[c].workers))//записать в путь нагрузку
+                                                    //записать в путь нагрузку
+                                                    if (!load_to_way(
+                                                        ref connect, 
+                                                        i, 
+                                                        z, 
+                                                        builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[z].floor[x].dep[c].workers
+                                                    ))
                                                         throw new Exception("путь не найден");
                                                 }
 
@@ -249,25 +232,38 @@ namespace Emionov_root
             }
 
         }
-        public static bool load_to_way(ref Connect connect, int[,] co, int a, int b, int load) //метод заполнения пути 
+
+        /// <summary>
+        /// метод заполнения пути
+        /// </summary>
+        /// <param name="connect">объект связи</param>
+        /// <param name="build_1">номер первого здания</param>
+        /// <param name="build_2">номер второго здания</param>
+        /// <param name="load">нагрузка</param>
+        /// <returns></returns>        
+        public static bool load_to_way(ref Connect connect, int build_1, int build_2, int load) 
         {
-            List<Int32> way = new List<int>();
             bool check = false;
-            way.Add(a);
-            if (a == b)
+            if (build_1 == build_2)
                 return true;
             for (int i = 0; i < connect.connect_length.GetLength(0); i++)
-                if (co[a, i] != 0)
+            {
+                // если первое здание с iым соединены
+                if (connect.connect_length[build_1, i] != 0)
                 {
-                    co[a, i] = 0;
-                    if (load_to_way(ref connect, co, i, b, load))
+                    // разъединяем первое здание с iым
+                    connect.connect_length[build_1, i] = 0;
+                    // тоже самое применяем для второго здания с iым
+                    if (load_to_way(ref connect, i, build_2, load))
                     {
-                        connect.connect_load[a, i] += load;
-                        connect.connect_load[i,a] += load;
+                        // и вместо расстояния между зданиями пишем нагрузку мазафака!!!!
+                        // логика просто космос
+                        connect.connect_load[build_1, i] += load;
+                        connect.connect_load[i, build_1] += load;
                         check = true;
                     }
-
                 }
+            }
             return check;
         }
         /// <summary>
@@ -292,6 +288,7 @@ namespace Emionov_root
             fl.swch_num = Convert.ToInt32(works / swch_ch_max) + 1;
             fl.swch_chan = Convert.ToInt32(works / fl.swch_num);
             // круговая ссылка wtf???
+            // UPD: оказывается это значение уже высчитанов функции build_load_calculation
             fl.swch_speed = builds.build[build].floor[floor].fl_req.swch_speed;
             fl.cabel_length = ((Convert.ToInt32(Math.Sqrt(builds.build[build].square)) * 2 + 1) / 2 + 2) * works / fl.swch_num+ Convert.ToInt32(Math.Sqrt(builds.build[build].square))*2;
             fl.cab_can_length = Convert.ToInt32(fl.cabel_length * 1.2);
@@ -306,8 +303,8 @@ namespace Emionov_root
             for (int i = 1; i <= builds.build[build].floor_num; i++)
                 bu.cabel_length += builds.build[build].height * i;
             bu.cab_can_length =Convert.ToInt32(bu.cabel_length * 1.2);
-            bu.power_uninter_req +=bu.swch_num*swch_pow; ///??????
             bu.swch_num = Convert.ToInt32(builds.build[build].floor_num / swch_ch_max) + 1;
+            bu.power_uninter_req +=bu.swch_num*swch_pow; ///??????
             bu.swch_chan = Convert.ToInt32(builds.build[build].floor_num / bu.swch_num);
             
 

@@ -84,12 +84,13 @@ namespace Eminem
 
                 document.Replase("BetweenBuilds", betw_buil);
 
-                string[] depart_tech_haeders = new string[5];
-                depart_tech_haeders[0] = "Название отдела";
-                depart_tech_haeders[1] = "Способ взаимодействия";
-                depart_tech_haeders[2] = "Информационная система";
-                depart_tech_haeders[3] = "Организационные единицы";
-                depart_tech_haeders[4] = "Характер решаемой задачи";
+                string[] depart_tech_haeders = new string []{
+                    "Название отдела",
+                    "Способ взаимодействия",
+                    "Информационная система",
+                    "Организационные единицы",
+                    "Характер решаемой задачи"
+                };
                 int department_count = 0;
                 string[,] depart_tech = new string[department_count + 1, 5];
                 Connect ConnectObj = new Connect();
