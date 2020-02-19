@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 
 
@@ -50,7 +51,6 @@ namespace Emionov_root
     }
     public struct Technology
     {
-
         public string name;
         public int load; // нагрузка в Мб!!!!
         public bool root; //является ли отдел корневым отделом, к которому идут все запросы
@@ -81,6 +81,7 @@ namespace Emionov_root
         public int[,] connect_load;
         public string[,] connect_type;
     } 
+
     public class Method
     {
         static int swch_pow = 50;
@@ -95,8 +96,26 @@ namespace Emionov_root
 
         public static void build_load_calculation(ref Builds builds)
         {
+            //foreach(var build in  builds.build)
+            //{
+            //    foreach(var floor in build.floor)
+            //    {
+            //        floor.dep_num = 3;
+            //    }
+            //}
+
+            var queryGroupMax = builds.build.Sum(
+                b => b.floor.Sum(
+                    f => f.dep.Where(
+                        d => d.tech.Where(t=>t.root).Select(t=>t.name).Contains("name")
+                    ).Sum(d => d.workers)
+                )
+            );
+
+
+            // ToDo переделать все это на методы классов
             int i = 0;
-            builds.load = new int[builds.build.Length];//создаем массив с нагрузками на здания
+            builds.load = new int[builds.build.Length]; //создаем массив с нагрузками на здания
             while (builds.build.Length > i)
             {
                 int fl = 0;
@@ -119,6 +138,7 @@ namespace Emionov_root
                                         {
                                             while (builds.build[z].floor[x].dep[c].tech.Length > v)
                                             {
+                                                // если технологии совпадают и есть юзер
                                                 if (builds.build[i].floor[fl].dep[de].tech[te].name.Equals(builds.build[z].floor[x].dep[c].tech[v].name)&& builds.build[z].floor[x].dep[c].tech[v].user)
                                                     client += builds.build[z].floor[x].dep[c].workers;//подсчет клиентов технологии
                                                 v++;
@@ -250,9 +270,17 @@ namespace Emionov_root
                 }
             return check;
         }
-        public static Floor_req floor_req(ref Builds builds, int build, int floor) //для каждого этажа сначала выполнить это!!!!!
+        /// <summary>
+        /// высчитывание требований этажа
+        /// </summary>
+        /// <param name="builds">ссылка на здание</param>
+        /// <param name="build">номер здания</param>
+        /// <param name="floor">номер этажа</param>
+        /// <returns></returns>
+        public static Floor_req floor_req(ref Builds builds, int build, int floor)
         {
-            Floor_req fl = new Floor_req(); int works = 0, serv=0;
+            Floor_req fl = new Floor_req();
+            int works = 0, serv=0;
             for (int i = 0; i < builds.build[build].floor[floor].dep.Length; i++)
             {
                 works += builds.build[build].floor[floor].dep[i].workers;
@@ -263,6 +291,7 @@ namespace Emionov_root
             }
             fl.swch_num = Convert.ToInt32(works / swch_ch_max) + 1;
             fl.swch_chan = Convert.ToInt32(works / fl.swch_num);
+            // круговая ссылка wtf???
             fl.swch_speed = builds.build[build].floor[floor].fl_req.swch_speed;
             fl.cabel_length = ((Convert.ToInt32(Math.Sqrt(builds.build[build].square)) * 2 + 1) / 2 + 2) * works / fl.swch_num+ Convert.ToInt32(Math.Sqrt(builds.build[build].square))*2;
             fl.cab_can_length = Convert.ToInt32(fl.cabel_length * 1.2);
@@ -356,6 +385,39 @@ namespace Emionov_root
             outt += Convert.ToInt64(ip);
             return outt;
 
+        }
+
+        public static void Example()
+        { 
+            Builds builds = new Builds {
+                build = new Build[] {
+                    new Build {
+                        cabel_type= "keke",
+                        build_req = new Build_req { },
+                        floor = new Floor[] {
+                            new Floor {
+                                dep_num = 1,
+                                dep = new Department[] {
+                                    new Department {
+                                        name = "",
+                                        workers = 13,
+                                        techno_count = 3,
+                                        tech = new Technology[] {
+                                            new Technology {
+                                                load = 3,
+                                                rem_serv = true,
+                                                // и так далее
+                                            }
+                                        },
+                                    }
+                                },
+                                Mob_st = 1,
+                                fl_req = new Floor_req { }
+                            },
+                        },
+                    }
+                }
+            };
         }
     }
 

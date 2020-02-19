@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Emionov_root;
 
+//using Eminem.Entities;
+
 
 namespace Eminem
 {
@@ -37,58 +39,37 @@ namespace Eminem
 
                 message = "Введите количество используемых Информационных систем: ";
                 int Tech_number = GetInt(message);
-                Technology[] T = new Technology[Tech_number];
-                string[] tehnol_tab_header = new string[3];
-                tehnol_tab_header[0] = "Решаемая задача";
-                tehnol_tab_header[1] = "Информационная система";
-                tehnol_tab_header[2] = "Характер решаемой задачи";
+                Technology[] TechnologyArray = new Technology[Tech_number];
+                string[] tehnol_tab_header = new string[] {
+                    "Решаемая задача",
+                    "Информационная система", 
+                    "Характер решаемой задачи"
+                };
+                
+                // заполнение сведений о ИС
                 string[,] tehno_tab = new string[Tech_number, 3];
                 for (int k = 0; k < Tech_number; k++)
                 {
-
                     Console.Write($"Введите название Информационной системы № {k+1}: ");
-                    T[k].name = Console.ReadLine();
-                    tehno_tab[k, 1] = T[k].name;
-                    message = $"Введите количество трафика Информационной системы в мб/с от пользователя (только целое число) {T[k].name}: ";
-                    T[k].load = GetInt(message);
+                    TechnologyArray[k].name = Console.ReadLine();
+                    tehno_tab[k, 1] = TechnologyArray[k].name;
+                    message = $"Введите количество трафика Информационной системы в мб/с от пользователя (только целое число) {TechnologyArray[k].name}: ";
+                    TechnologyArray[k].load = GetInt(message);
 
                 }
                 document.ReplaseTable("@@system_table", tehno_tab, tehnol_tab_header, 3);
 
-                Builds A = new Builds();
-                int Count = GetInt("Введите количество зданий: ");
-                document.Replase("Kolzdanii", Count.ToString());
-                /*
-               Console.WriteLine("Введите расстояния между зданиями, через запятую. Например: 400,600:");
-               string rofel = Console.ReadLine();
-               document.Replase("BetweenBuilds", rofel);
-               Console.WriteLine("Введите количество этажей в зданиях, через запятую. Например: 4,3:");
-               string rofel1 = Console.ReadLine();
-               document.Replase("FloorBuilds", rofel1);
-               Console.WriteLine("Введите площадь этажей в зданиях, через запятую. Например: 400,300:");
-               string rofel2 = Console.ReadLine();
-               document.Replase("FloorSquare", rofel2);
-               Console.WriteLine("Введите высоту этажей в зданиях, через запятую. Например: 4,3:");
-               string rofel3 = Console.ReadLine();
-               document.Replase("FloorHeight", rofel3);
+                Builds BuildsObj = new Builds();
+                int BuildsCount = GetInt("Введите количество зданий: ");
+                document.Replase("Kolzdanii", BuildsCount.ToString());
+                
 
-               Console.WriteLine("Введите количество рабочих по этажам, через запятую. Например: 400 на первом,300 на втором,200 на остальных:");
-               string rofel5 = Console.ReadLine();
-               document.Replase("WorkersFloors", rofel5);
-               Console.WriteLine("Введите количество мобильных станций в помещении. Например, 40:");
-               string rofel6 = Console.ReadLine();
-               document.Replase("MobStations", rofel6);
-               */
-
-                /*
-
-               */
-
-                int[,] matrix = new int[Count, Count];
+                int[,] matrix = new int[BuildsCount, BuildsCount];
                 string betw_buil = "-";
                 // если имеется больше одного здания
-                if (Count > 1)
+                if (BuildsCount > 1)
                 {
+                    // создаем связки зданий
                     int pari = GetInt("Сколько существует пар зданий связанных: ");
                     for (int z = 0; z < pari; z++)
                     {
@@ -111,77 +92,80 @@ namespace Eminem
                 depart_tech_haeders[4] = "Характер решаемой задачи";
                 int department_count = 0;
                 string[,] depart_tech = new string[department_count + 1, 5];
-                Connect M = new Connect();
-                M.connect_length = matrix;
+                Connect ConnectObj = new Connect();
+                ConnectObj.connect_length = matrix;
                 int i, all_workers = 0;
-                A.build = new Build[Count];
+                BuildsObj.build = new Build[BuildsCount];
                 string floor_num = "", squre_num = "", hight_num = "", workers_num = "", mob_st_num = "", descr_otd = "", use_eq = "", uninterruptedpower = "";
-                for (i = 0; i < Count; i++)
+                for (i = 0; i < BuildsCount; i++)
                 {
                     descr_otd += " В здании №" + i + "находятся: ";
-                    A.build[i] = new Build();
-                    A.build[i].floor_num = GetInt($"Введите количество этажей здания №{i + 1}: ");
-                    floor_num += A.build[i].floor_num + ",";
-                    A.build[i].square = GetInt($"Введите площадь этажа здания №{i + 1}: ");
-                    squre_num += A.build[i].square + ",";
-                    A.build[i].height = GetInt($"Введите высоту этажа здания №{i + 1}: ");
-                    hight_num += A.build[i].height;
+                    BuildsObj.build[i] = new Build();
+                    BuildsObj.build[i].floor_num = GetInt($"Введите количество этажей здания №{i + 1}: ");
+                    floor_num += BuildsObj.build[i].floor_num + ",";
+                    BuildsObj.build[i].square = GetInt($"Введите площадь этажа здания №{i + 1}: ");
+                    squre_num += BuildsObj.build[i].square + ",";
+                    BuildsObj.build[i].height = GetInt($"Введите высоту этажа здания №{i + 1}: ");
+                    hight_num += BuildsObj.build[i].height;
                     int mob_st = GetInt($"Введите количество мобильных станций здания №{i + 1}: ");
                     mob_st_num += mob_st + ",";
                     workers_num += i + " ";
 
-                    A.build[i].floor = new Floor[A.build[i].floor_num];
-                    for (int i1 = 0; i1 < A.build[i].floor_num; i1++)
+                    BuildsObj.build[i].floor = new Floor[BuildsObj.build[i].floor_num];
+                    for (int i1 = 0; i1 < BuildsObj.build[i].floor_num; i1++)
                     {
                         descr_otd += i1 + "этаж - ";
                         int workers = 0;
-                        A.build[i].floor[i1] = new Floor();
-                        A.build[i].floor[i1].Mob_st = mob_st;
-                        A.build[i].floor[i1].dep_num = GetInt($"Введите количество отделов этажа № {i1 + 1}  Здания № {i + 1}: ");
-                        A.build[i].floor[i1].dep = new Department[A.build[i].floor[i1].dep_num];
-                        for (int i2 = 0; i2 < A.build[i].floor[i1].dep_num; i2++)
+                        BuildsObj.build[i].floor[i1] = new Floor();
+                        BuildsObj.build[i].floor[i1].Mob_st = mob_st;
+                        BuildsObj.build[i].floor[i1].dep_num = GetInt($"Введите количество отделов этажа № {i1 + 1}  Здания № {i + 1}: ");
+                        BuildsObj.build[i].floor[i1].dep = new Department[BuildsObj.build[i].floor[i1].dep_num];
+                        for (int i2 = 0; i2 < BuildsObj.build[i].floor[i1].dep_num; i2++)
                         {
                             Console.WriteLine("Напоминание, под каким номером какая Информационная система:");
                             for (int k = 0; k < Tech_number; k++)
-                                Console.WriteLine($"Информационная система № {k + 1}: {T[k].name}");
+                                Console.WriteLine($"Информационная система № {k + 1}: {TechnologyArray[k].name}");
+
                             Console.Write($"Введите название отдела № {i2 + 1}  этажа № {i + 1}: ");
-                            A.build[i].floor[i1].dep[i2].name = Console.ReadLine();
-                            depart_tech[department_count, 0] = A.build[i].floor[i1].dep[i2].name;
+                            BuildsObj.build[i].floor[i1].dep[i2].name = Console.ReadLine();
+                            depart_tech[department_count, 0] = BuildsObj.build[i].floor[i1].dep[i2].name;
+
                             message = $"Введите количество работников отдела № {i2 + 1}  этажа № {i1 + 1} здания № {i + 1}:" ;
-                            A.build[i].floor[i1].dep[i2].workers = GetInt(message);
-                            workers += A.build[i].floor[i1].dep[i2].workers;
-                            all_workers += A.build[i].floor[i1].dep[i2].workers;
+                            BuildsObj.build[i].floor[i1].dep[i2].workers = GetInt(message);
+                            workers += BuildsObj.build[i].floor[i1].dep[i2].workers;
+                            all_workers += BuildsObj.build[i].floor[i1].dep[i2].workers;
+
                             message = $"Введите количество используемых Информационных систем отдела № {i2 + 1}  этажа № {i1 + 1} здания № {i + 1}: ";
-                            A.build[i].floor[i1].dep[i2].techno_count = GetInt(message);
-                            A.build[i].floor[i1].dep[i2].tech = new Technology[A.build[i].floor[i1].dep[i2].techno_count];
-                            for (int i3 = 0; i3 < A.build[i].floor[i1].dep[i2].techno_count; i3++)
+                            BuildsObj.build[i].floor[i1].dep[i2].techno_count = GetInt(message);
+                            BuildsObj.build[i].floor[i1].dep[i2].tech = new Technology[BuildsObj.build[i].floor[i1].dep[i2].techno_count];
+                            for (int i3 = 0; i3 < BuildsObj.build[i].floor[i1].dep[i2].techno_count; i3++)
                             {
 
                                 message = "Введите номер Информационной системы, которая используется в отделе: ";
-                                A.build[i].floor[i1].dep[i2].tech[i3] = T[GetInt(message) - 1];
-                                depart_tech[department_count, 2] += A.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
-                                A.build[i].floor[i1].dep[i2].tech[i3].user = true;
+                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3] = TechnologyArray[GetInt(message) - 1];
+                                depart_tech[department_count, 2] += BuildsObj.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
+                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3].user = true;
                                 depart_tech[department_count, 1] += "Пользователь";
                                 Console.WriteLine("Является ли отдел корневым отделом, к которому идут все запросы? Да - '1' Нет - '2': ");
                                 string qw = Console.ReadLine();
                                 if (qw == "1")
                                 {
-                                    A.build[i].floor[i1].dep[i2].tech[i3].root = true;
+                                    BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = true;
                                     depart_tech[department_count, 1] += ",Сервер";
                                 }
                                 else
                                 if (qw == "2")
-                                    A.build[i].floor[i1].dep[i2].tech[i3].root = false;
+                                    BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = false;
                                 depart_tech[department_count, 1] += "^i";
                                 Console.WriteLine("Использует ли программа ресурсы сети интернет, если да - все запросы считаются внесетевыми и не рассчитываются между зданиями. Да - '1' Нет - '2': ");
                                 qw = Console.ReadLine();
                                 if (qw == "1")
-                                    A.build[i].floor[i1].dep[i2].tech[i3].rem_serv = true;
+                                    BuildsObj.build[i].floor[i1].dep[i2].tech[i3].rem_serv = true;
                                 else
                                 if (qw == "2")
-                                    A.build[i].floor[i1].dep[i2].tech[i3].rem_serv = false;
+                                    BuildsObj.build[i].floor[i1].dep[i2].tech[i3].rem_serv = false;
                             }
-                            descr_otd += A.build[i].floor[i1].dep[i2].name + " (" + A.build[i].floor[i1].dep[i2].workers + " рабочих станций), ";
+                            descr_otd += BuildsObj.build[i].floor[i1].dep[i2].name + " (" + BuildsObj.build[i].floor[i1].dep[i2].workers + " рабочих станций), ";
                             department_count++;
                             string[,] buf_mas = new string[department_count + 1, 5];
                             Array.Copy(depart_tech, buf_mas, depart_tech.Length);
@@ -208,65 +192,65 @@ namespace Eminem
                 document.Replase("@@Otdel", descr_otd);// заполняем описания отделов
                 int load_num = 0;
 
-                Method.build_load_calculation(ref A);
-                for (int v = 0; v < A.load.Length; v++)
+                Method.build_load_calculation(ref BuildsObj);
+                for (int v = 0; v < BuildsObj.load.Length; v++)
                 {
-                    load_num += A.load[v];
-                    Console.WriteLine("Предполагаемая нагрузка внутри здания № " + (v + 1) + " =" + A.load[v]);
-                    if (A.load[v] < 1000)
+                    load_num += BuildsObj.load[v];
+                    Console.WriteLine("Предполагаемая нагрузка внутри здания № " + (v + 1) + " =" + BuildsObj.load[v]);
+                    if (BuildsObj.load[v] < 1000)
                     {
-                        A.build[v].cabel_type = "ethernet";
+                        BuildsObj.build[v].cabel_type = "ethernet";
                         Console.WriteLine("В здании № " + (v + 1) + " предполагается использование кабеля ethernet");
 
-                        if (A.build[v].height * A.build[v].floor_num > 100)
+                        if (BuildsObj.build[v].height * BuildsObj.build[v].floor_num > 100)
                             Console.WriteLine("Требуется применение дополнительных устройств усиления для вертикальных кабелей");
                         Console.WriteLine("Вы согласны? 1 - Да, 2 - Нет ");
 
                         if (Console.ReadLine() == "2")
                         {
-                            A.build[v].cabel_type = "оптоволокно";
-                            for (int i5 = 0; i5 < A.build[v].floor_num; i5++)
-                                itog_dlina_optovolokno += A.build[v].height * i5;
+                            BuildsObj.build[v].cabel_type = "оптоволокно";
+                            for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
+                                itog_dlina_optovolokno += BuildsObj.build[v].height * i5;
 
                         }
                         else
-                            for (int i5 = 0; i5 < A.build[v].floor_num; i5++)
-                                itog_dlina_ethernet += A.build[v].height * i5;
+                            for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
+                                itog_dlina_ethernet += BuildsObj.build[v].height * i5;
                     }
                     else
                     {
                         Console.WriteLine("В здании № " + (v + 1) + " предполагается использование оптоволоконного кабеля, поскольку нагрузка на сеть больше 1000 Мб/c, использование другого типа кабеля не доступно");
-                        A.build[v].cabel_type = "оптоволокно";
+                        BuildsObj.build[v].cabel_type = "оптоволокно";
                     }
 
                 }
 
                 document.Replase("ItogTrafik", Convert.ToString(load_num));
 
-                Method.connect_load_calculation(ref M, A);
-                M.connect_type = new string[M.connect_load.GetLength(0), M.connect_load.GetLength(0)];
+                Method.connect_load_calculation(ref ConnectObj, BuildsObj);
+                ConnectObj.connect_type = new string[ConnectObj.connect_load.GetLength(0), ConnectObj.connect_load.GetLength(0)];
 
-                for (int v = 0; v < M.connect_load.GetLength(0); v++)
-                    for (int f = v; f < M.connect_load.GetLength(0); f++)
+                for (int v = 0; v < ConnectObj.connect_load.GetLength(0); v++)
+                    for (int f = v; f < ConnectObj.connect_load.GetLength(0); f++)
                     {
                         bool check = false;
-                        if (M.connect_load[v, f] != 0)
+                        if (ConnectObj.connect_load[v, f] != 0)
                         {
 
-                            Console.WriteLine("Предполагаемая нагрузка между зданиями № " + (v + 1) + " и " + (f + 1) + "= " + M.connect_load[v, f] + " Расстояние = " + M.connect_length[v, f]);
-                            if (M.connect_load[v, f] < 1000 && M.connect_length[v, f] < 100)
+                            Console.WriteLine("Предполагаемая нагрузка между зданиями № " + (v + 1) + " и " + (f + 1) + "= " + ConnectObj.connect_load[v, f] + " Расстояние = " + ConnectObj.connect_length[v, f]);
+                            if (ConnectObj.connect_load[v, f] < 1000 && ConnectObj.connect_length[v, f] < 100)
                             {
                                 check = true;
                                 Console.WriteLine("Для соединения между зданиями " + (v + 1) + " и " + (f + 1) + " подходит использование кабеля ethernet (0)");
 
                             }
-                            if (M.connect_load[v, f] < 40000 && M.connect_length[v, f] < 3000)
+                            if (ConnectObj.connect_load[v, f] < 40000 && ConnectObj.connect_length[v, f] < 3000)
                             {
                                 check = true;
                                 Console.WriteLine("Для соединения между зданиями " + (v + 1) + " и " + (f + 1) + " подходит использование оптоволоконного кабеля (1)");
 
                             }
-                            if (M.connect_load[v, f] < 10 && M.connect_length[v, f] < 500)
+                            if (ConnectObj.connect_load[v, f] < 10 && ConnectObj.connect_length[v, f] < 500)
                             {
                                 check = true;
                                 Console.WriteLine("Для соединения между зданиями " + (v + 1) + " и " + (f + 1) + " подходит использование коаксиального кабеля (2)");
@@ -280,26 +264,26 @@ namespace Eminem
                             {
                                 case "0":
                                     {
-                                        M.connect_type[v, f] = "ethernet";
-                                        M.connect_type[f, v] = "ethernet";
+                                        ConnectObj.connect_type[v, f] = "ethernet";
+                                        ConnectObj.connect_type[f, v] = "ethernet";
                                         BetweenZdaniiCabel = "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель ethernet^l";
-                                        itog_dlina_ethernet += M.connect_length[v, f];
+                                        itog_dlina_ethernet += ConnectObj.connect_length[v, f];
                                     }
                                     break;
                                 case "1":
                                     {
-                                        M.connect_type[v, f] = "Оптоволокно";
-                                        M.connect_type[f, v] = "Оптоволокно";
-                                        itog_dlina_optovolokno += M.connect_length[v, f];
+                                        ConnectObj.connect_type[v, f] = "Оптоволокно";
+                                        ConnectObj.connect_type[f, v] = "Оптоволокно";
+                                        itog_dlina_optovolokno += ConnectObj.connect_length[v, f];
                                         BetweenZdaniiCabel = "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель кабеля^l";
 
                                     }
                                     break;
                                 case "2":
                                     {
-                                        M.connect_type[v, f] = "коаксиальный";
-                                        M.connect_type[f, v] = "коаксиальный";
-                                        itog_dlina_koaks += M.connect_length[v, f];
+                                        ConnectObj.connect_type[v, f] = "коаксиальный";
+                                        ConnectObj.connect_type[f, v] = "коаксиальный";
+                                        itog_dlina_koaks += ConnectObj.connect_length[v, f];
                                         BetweenZdaniiCabel = "Для соединения между зданиями " + Convert.ToString(v) + " и " + Convert.ToString(f) + "будет использован кабель кабеля^l";
                                     }
                                     break;
@@ -309,17 +293,17 @@ namespace Eminem
                     }
                 //Console.ReadKey();
                 
-                for (i = 0; i < Count; i++)
+                for (i = 0; i < BuildsCount; i++)
 
                 {
                     int un_pow = 0;
                     Console.WriteLine("Здание № " + (i + 1));
                     //use_eq += "^l Для здания №" + (i + 1);
-                    for (int i1 = 0; i1 < A.build[i].floor_num; i1++)
+                    for (int i1 = 0; i1 < BuildsObj.build[i].floor_num; i1++)
                     {
 
                         Console.WriteLine("Этаж № " + (i1 + 1));
-                        Floor_req bl = Method.floor_req(ref A, i, i1);
+                        Floor_req bl = Method.floor_req(ref BuildsObj, i, i1);
                         itog_dlina_ethernet += bl.cabel_length;
                         cab_can_dlina_itog += bl.cab_can_length;
                         Console.WriteLine("Общая длина кабелей на этаже = " + bl.cabel_length);
@@ -335,8 +319,8 @@ namespace Eminem
                     }
                     use_eq += "Здание №" + Convert.ToString(i + 1) + "^l" + CabelDlinaFloor;
                     Console.WriteLine("Горизонтальная структура");
-                    Build_req bl1 = Method.build_req(ref A, i);
-                    switch (A.build[i].cabel_type)
+                    Build_req bl1 = Method.build_req(ref BuildsObj, i);
+                    switch (BuildsObj.build[i].cabel_type)
                     {
                         case "оптоволокно":
                             itog_dlina_optovolokno += bl1.cabel_length;
@@ -373,7 +357,7 @@ namespace Eminem
                     use_tech += "Gigabit Ethernet 10 Base-5, основанный на коаксиальном кабельном соединении, ";
                 if (itog_dlina_optovolokno != 0)
                     use_tech += "Gigabit Ethernet 1000 Base-LX, использующий одномодовое волокно, ";
-                IP[] ip = Method.IP_ret(A);
+                IP[] ip = Method.IP_ret(BuildsObj);
                 string[] ip_table_header = new string[3];
                 ip_table_header[0] = "Номер здания";
                 ip_table_header[1] = "Назначение";
