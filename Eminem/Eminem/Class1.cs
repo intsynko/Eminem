@@ -98,7 +98,7 @@ namespace Emionov_root
         {
             // ToDo переделать все это на методы классов
 
-            //создаем массив с нагрузками на здания
+            // создаем массив с нагрузками на здания
             builds.load = new int[builds.build.Length]; 
             for (int i=0; i < builds.build.Length; i++)
             {
@@ -131,7 +131,7 @@ namespace Emionov_root
                                 builds.load[i] += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
                                 builds.build[i].floor[fl].fl_req.swch_speed += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
                             }
-                            // если отдел 
+                            // если отдел использует тыренет
                             if (builds.build[i].floor[fl].dep[de].tech[te].rem_serv)
                             {
                                 builds.load[i] += builds.build[i].floor[fl].dep[de].workers * builds.build[i].floor[fl].dep[de].tech[te].load;
@@ -170,7 +170,7 @@ namespace Emionov_root
                                             {
                                                 if (builds.build[i].floor[fl].dep[de].tech[te].name.Equals(builds.build[z].floor[x].dep[c].tech[v].name) && builds.build[z].floor[x].dep[c].tech[v].root)
                                                 {
-                                                    //записать в путь нагрузку
+                                                    // записать в путь нагрузку
                                                     if (!load_to_way(
                                                             ref connect,
                                                             i,
@@ -203,9 +203,9 @@ namespace Emionov_root
                                                 {
                                                     //записать в путь нагрузку
                                                     if (!load_to_way(
-                                                        ref connect, 
-                                                        i, 
-                                                        z, 
+                                                        ref connect,
+                                                        i,
+                                                        z,
                                                         builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[z].floor[x].dep[c].workers
                                                     ))
                                                         throw new Exception("путь не найден");
@@ -219,8 +219,6 @@ namespace Emionov_root
                                     }
                                     z++;
                                 }
-
-
                             }
                             te++;
                         }
@@ -313,7 +311,7 @@ namespace Emionov_root
         }
 
 
-        public static IP[] IP_ret(Builds a)
+        public static IP[] IP_ret(ref Builds a)
         {
             IP[] ret = new IP[1];
             int cur_str = 0;

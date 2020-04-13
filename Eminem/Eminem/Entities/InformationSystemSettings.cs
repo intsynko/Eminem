@@ -12,5 +12,10 @@ namespace Eminem.Entities
         /// использует ли программа ресурсы сети интернет
         /// </summary>
         public bool IsRemoteServer;
+
+        public InformationSystemSettings(bool IsRemoteServer)
+        {
+            this.IsRemoteServer = IsRemoteServer;
+        }
     }
 }

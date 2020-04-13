@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Emionov_root;
 
+
 //using Eminem.Entities;
 
 
@@ -18,6 +19,7 @@ namespace Eminem
 
         static void Main(string[] args)
         {
+            //Test.TestFunc();
             int itog_dlina_ethernet = 0;
             int itog_dlina_optovolokno = 0;
             int itog_dlina_koaks = 0;
@@ -232,6 +234,7 @@ namespace Eminem
                 ConnectObj.connect_type = new string[ConnectObj.connect_load.GetLength(0), ConnectObj.connect_load.GetLength(0)];
 
                 for (int v = 0; v < ConnectObj.connect_load.GetLength(0); v++)
+                {
                     for (int f = v; f < ConnectObj.connect_load.GetLength(0); f++)
                     {
                         bool check = false;
@@ -292,6 +295,7 @@ namespace Eminem
                             document.Replase("@@CabelBetweenBuilds", BetweenZdaniiCabel);
                         }
                     }
+                }
                 //Console.ReadKey();
                 
                 for (i = 0; i < BuildsCount; i++)
@@ -358,7 +362,7 @@ namespace Eminem
                     use_tech += "Gigabit Ethernet 10 Base-5, основанный на коаксиальном кабельном соединении, ";
                 if (itog_dlina_optovolokno != 0)
                     use_tech += "Gigabit Ethernet 1000 Base-LX, использующий одномодовое волокно, ";
-                IP[] ip = Method.IP_ret(BuildsObj);
+                IP[] ip = Method.IP_ret(ref BuildsObj);
                 string[] ip_table_header = new string[3];
                 ip_table_header[0] = "Номер здания";
                 ip_table_header[1] = "Назначение";
@@ -373,8 +377,9 @@ namespace Eminem
                 document.ReplaseTable("@@IP", ip_table, ip_table_header, 7);
                 document.Replase("@@techolog", use_tech);
                 document.Replase("@@ equipment", use_eq);
+                Console.Read();
             }
-            Console.Read();
+            
         }
 
 

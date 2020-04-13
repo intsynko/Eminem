@@ -22,6 +22,13 @@ namespace Eminem.Entities
         /// </summary>
         public List<Tuple<Departament, InformationSystemSettings>> DepatrtementsList { get; set; }
 
+        public InformationSystem(string Name, int Traffic)
+        {
+            this.Name = Name;
+            this.Traffic = Traffic;
+            this.DepatrtementsList = new List<Tuple<Departament, InformationSystemSettings>>();
+        }
+
         public int GetClientsCount()
         {
             return DepatrtementsList.Sum(x => x.Item1.StaffCount);

@@ -45,13 +45,17 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Entities\Build.cs" />
+    <Compile Include="Entities\CableType.cs" />
+    <Compile Include="Entities\Defaults.cs" />
     <Compile Include="Entities\Depatrtement.cs" />
     <Compile Include="Entities\Floor.cs" />
     <Compile Include="Entities\InformationSystem.cs" />
     <Compile Include="Entities\InformationSystemSettings.cs" />
+    <Compile Include="Entities\Project.cs" />
     <Compile Include="MyDocument.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
