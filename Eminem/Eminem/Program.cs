@@ -40,8 +40,8 @@ namespace Eminem
                 document.Replase("VariantKurs", nom_var.ToString());
 
                 message = "Введите количество используемых Информационных систем: ";
-                int Tech_number = GetInt(message);
-                Technology[] TechnologyArray = new Technology[Tech_number];
+                int InformationSystemCount = GetInt(message);
+                Technology[] TechnologyArray = new Technology[InformationSystemCount];
                 string[] tehnol_tab_header = new string[] {
                     "Решаемая задача",
                     "Информационная система", 
@@ -49,8 +49,8 @@ namespace Eminem
                 };
                 
                 // заполнение сведений о ИС
-                string[,] tehno_tab = new string[Tech_number, 3];
-                for (int k = 0; k < Tech_number; k++)
+                string[,] tehno_tab = new string[InformationSystemCount, 3];
+                for (int k = 0; k < InformationSystemCount; k++)
                 {
                     Console.Write($"Введите название Информационной системы № {k+1}: ");
                     TechnologyArray[k].name = Console.ReadLine();
@@ -121,11 +121,13 @@ namespace Eminem
                         Console.WriteLine($"----------Этаж {i1 + 1}----------------");
                         descr_otd += i1 + "этаж - ";
                         int workers = 0;
+
                         Console.WriteLine("----------Напоминалка------------");
                         Console.WriteLine("Напоминание, под каким номером какая Информационная система: ");
-                        for (int k = 0; k < Tech_number; k++)
-                            Console.WriteLine($"Информационная система № {k + 1}: {T[k].name}");
+                        for (int k = 0; k < InformationSystemCount; k++)
+                            Console.WriteLine($"Информационная система № {k + 1}: {TechnologyArray[k].name}");
                         Console.WriteLine("--------------------------------");
+
                         BuildsObj.build[i].floor[i1] = new Floor();
                         BuildsObj.build[i].floor[i1].Mob_st = mob_st;
                         BuildsObj.build[i].floor[i1].dep_num = GetInt($"Введите количество отделов этажа № {i1 + 1}  Здания № {i + 1}: ");
@@ -133,10 +135,11 @@ namespace Eminem
                         for (int i2 = 0; i2 < BuildsObj.build[i].floor[i1].dep_num; i2++)
                         {
                             Console.WriteLine("Напоминание, под каким номером какая Информационная система:");
-                            for (int k = 0; k < Tech_number; k++)
+                            for (int k = 0; k < InformationSystemCount; k++)
                                 Console.WriteLine($"Информационная система № {k + 1}: {TechnologyArray[k].name}");
 
-                            Console.Write($"Введите название отдела № {i2 + 1}  этажа № {i + 1}: ");
+                            Console.WriteLine($"----------Отдел {i2 + 1}----------------");
+                            Console.Write($"Введите название отдела: ");
                             BuildsObj.build[i].floor[i1].dep[i2].name = Console.ReadLine();
                             depart_tech[department_count, 0] = BuildsObj.build[i].floor[i1].dep[i2].name;
 
@@ -152,35 +155,25 @@ namespace Eminem
                             {
 
                                 message = "Введите номер Информационной системы, которая используется в отделе: ";
-                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3] = TechnologyArray[GetInt(message, T.Length) - 1];
+                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3] = TechnologyArray[GetInt(message, TechnologyArray.Length) - 1];
                                 depart_tech[department_count, 2] += BuildsObj.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
                                 BuildsObj.build[i].floor[i1].dep[i2].tech[i3].user = true;
+                                depart_tech[department_count, 1] += "^i";
                                 depart_tech[department_count, 1] += "Пользователь";
 
-                                string qw = "";
-                                Console.WriteLine("Является ли отдел корневым отделом," +
-                                    " к которому идут все запросы? Да - '1' Нет - '2': ");
-                                do { qw = Console.ReadLine();} while (qw != "1" || qw != "2");
-                                if (qw == "1")
+                                if (Question("Является ли отдел корневым отделом, к которому идут все запросы?"))
                                 {
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = true;
                                     depart_tech[department_count, 1] += ",Сервер";
                                 }
                                 else
-                                if (qw == "2")
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = false;
-                                depart_tech[department_count, 1] += "^i";
-                                Console.WriteLine("Использует ли программа ресурсы сети интернет, " +
+
+                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3].rem_serv = Question(
+                                    "Использует ли программа ресурсы сети интернет, " +
                                     "если да - все запросы считаются внесетевыми и не рассчитываются " +
-                                    "между зданиями. Да - '1' Нет - '2': ");
-
-                                do { qw = Console.ReadLine(); } while (qw != "1" || qw != "2");
-
-                                if (qw == "1")
-                                    BuildsObj.build[i].floor[i1].dep[i2].tech[i3].rem_serv = true;
-                                else
-                                if (qw == "2")
-                                    BuildsObj.build[i].floor[i1].dep[i2].tech[i3].rem_serv = false;
+                                    "между зданиями."
+                                );
                             }
                             descr_otd += BuildsObj.build[i].floor[i1].dep[i2].name + " (" + BuildsObj.build[i].floor[i1].dep[i2].workers + " рабочих станций), ";
                             department_count++;
@@ -448,6 +441,19 @@ namespace Eminem
                     );
             }
 
+        }
+
+        /// <summary>
+        /// Запрошивает у вопрос с ответами да и нет
+        /// </summary>
+        /// <param name="message">Сообщение вопроса</param>
+        /// <returns></returns>
+        static bool Question(string message)
+        {
+            Console.WriteLine($"{message} \n Да - '1' Нет - '2': ");
+            string qw;
+            do { qw = Console.ReadLine(); } while (qw != "1" || qw != "2");
+            return qw == "1";
         }
     }
 
