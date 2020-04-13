@@ -75,8 +75,8 @@ namespace Eminem
                     int pari = GetInt("Сколько существует пар зданий связанных: ");
                     for (int z = 0; z < pari; z++)
                     {
-                        int first_build = GetInt("Введите номер первого из двух связанных зданий: ");
-                        int second_build = GetInt("Введите номер второго из двух связанных зданий: ");
+                        int first_build = GetInt("Введите номер первого из двух связанных зданий: ", matrix.GetLength(0));
+                        int second_build = GetInt("Введите номер второго из двух связанных зданий: ", matrix.GetLength(0));
                         int length = GetInt("Введите расстояние между этими 2 зданиями: ");
                         matrix[first_build - 1, second_build - 1] = length;
                         matrix[second_build - 1, first_build - 1] = length;
@@ -102,6 +102,7 @@ namespace Eminem
                 string floor_num = "", squre_num = "", hight_num = "", workers_num = "", mob_st_num = "", descr_otd = "", use_eq = "", uninterruptedpower = "";
                 for (i = 0; i < BuildsCount; i++)
                 {
+                    Console.WriteLine($"----------Здание {i + 1}----------------");
                     descr_otd += " В здании №" + i + "находятся: ";
                     BuildsObj.build[i] = new Build();
                     BuildsObj.build[i].floor_num = GetInt($"Введите количество этажей здания №{i + 1}: ");
@@ -117,8 +118,14 @@ namespace Eminem
                     BuildsObj.build[i].floor = new Floor[BuildsObj.build[i].floor_num];
                     for (int i1 = 0; i1 < BuildsObj.build[i].floor_num; i1++)
                     {
+                        Console.WriteLine($"----------Этаж {i1 + 1}----------------");
                         descr_otd += i1 + "этаж - ";
                         int workers = 0;
+                        Console.WriteLine("----------Напоминалка------------");
+                        Console.WriteLine("Напоминание, под каким номером какая Информационная система: ");
+                        for (int k = 0; k < Tech_number; k++)
+                            Console.WriteLine($"Информационная система № {k + 1}: {T[k].name}");
+                        Console.WriteLine("--------------------------------");
                         BuildsObj.build[i].floor[i1] = new Floor();
                         BuildsObj.build[i].floor[i1].Mob_st = mob_st;
                         BuildsObj.build[i].floor[i1].dep_num = GetInt($"Введите количество отделов этажа № {i1 + 1}  Здания № {i + 1}: ");
@@ -133,24 +140,27 @@ namespace Eminem
                             BuildsObj.build[i].floor[i1].dep[i2].name = Console.ReadLine();
                             depart_tech[department_count, 0] = BuildsObj.build[i].floor[i1].dep[i2].name;
 
-                            message = $"Введите количество работников отдела № {i2 + 1}  этажа № {i1 + 1} здания № {i + 1}:" ;
+                            message = $"Введите количество работников отдела:" ;
                             BuildsObj.build[i].floor[i1].dep[i2].workers = GetInt(message);
                             workers += BuildsObj.build[i].floor[i1].dep[i2].workers;
                             all_workers += BuildsObj.build[i].floor[i1].dep[i2].workers;
 
-                            message = $"Введите количество используемых Информационных систем отдела № {i2 + 1}  этажа № {i1 + 1} здания № {i + 1}: ";
+                            message = $"Введите количество используемых Информационных систем отдела: ";
                             BuildsObj.build[i].floor[i1].dep[i2].techno_count = GetInt(message);
                             BuildsObj.build[i].floor[i1].dep[i2].tech = new Technology[BuildsObj.build[i].floor[i1].dep[i2].techno_count];
                             for (int i3 = 0; i3 < BuildsObj.build[i].floor[i1].dep[i2].techno_count; i3++)
                             {
 
                                 message = "Введите номер Информационной системы, которая используется в отделе: ";
-                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3] = TechnologyArray[GetInt(message) - 1];
+                                BuildsObj.build[i].floor[i1].dep[i2].tech[i3] = TechnologyArray[GetInt(message, T.Length) - 1];
                                 depart_tech[department_count, 2] += BuildsObj.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
                                 BuildsObj.build[i].floor[i1].dep[i2].tech[i3].user = true;
                                 depart_tech[department_count, 1] += "Пользователь";
-                                Console.WriteLine("Является ли отдел корневым отделом, к которому идут все запросы? Да - '1' Нет - '2': ");
-                                string qw = Console.ReadLine();
+
+                                string qw = "";
+                                Console.WriteLine("Является ли отдел корневым отделом," +
+                                    " к которому идут все запросы? Да - '1' Нет - '2': ");
+                                do { qw = Console.ReadLine();} while (qw != "1" || qw != "2");
                                 if (qw == "1")
                                 {
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = true;
@@ -160,8 +170,12 @@ namespace Eminem
                                 if (qw == "2")
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = false;
                                 depart_tech[department_count, 1] += "^i";
-                                Console.WriteLine("Использует ли программа ресурсы сети интернет, если да - все запросы считаются внесетевыми и не рассчитываются между зданиями. Да - '1' Нет - '2': ");
-                                qw = Console.ReadLine();
+                                Console.WriteLine("Использует ли программа ресурсы сети интернет, " +
+                                    "если да - все запросы считаются внесетевыми и не рассчитываются " +
+                                    "между зданиями. Да - '1' Нет - '2': ");
+
+                                do { qw = Console.ReadLine(); } while (qw != "1" || qw != "2");
+
                                 if (qw == "1")
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].rem_serv = true;
                                 else
@@ -173,11 +187,14 @@ namespace Eminem
                             string[,] buf_mas = new string[department_count + 1, 5];
                             Array.Copy(depart_tech, buf_mas, depart_tech.Length);
                             depart_tech = buf_mas;
+                            Console.WriteLine("--------------------------------");
 
                         }
                         workers_num += workers + ",";
+                        Console.WriteLine("--------------------------------");
                     }
                     workers_num += "^l";
+                    Console.WriteLine("--------------------------------");
                 }
                 Console.WriteLine("Подождите, идет заполнение документа");
                 document.ReplaseTable("@@depart_tech", depart_tech, depart_tech_haeders, 6);
@@ -209,16 +226,17 @@ namespace Eminem
                             Console.WriteLine("Требуется применение дополнительных устройств усиления для вертикальных кабелей");
                         Console.WriteLine("Вы согласны? 1 - Да, 2 - Нет ");
 
+                        int len = 0;
+                        for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
+                            len += BuildsObj.build[v].height * i5;
+
                         if (Console.ReadLine() == "2")
                         {
                             BuildsObj.build[v].cabel_type = "оптоволокно";
-                            for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
-                                itog_dlina_optovolokno += BuildsObj.build[v].height * i5;
-
+                            itog_dlina_optovolokno = len;
                         }
                         else
-                            for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
-                                itog_dlina_ethernet += BuildsObj.build[v].height * i5;
+                            itog_dlina_ethernet += len;
                     }
                     else
                     {
@@ -383,12 +401,13 @@ namespace Eminem
         }
 
 
+        
         /// <summary>
         /// Запрошивает у пользователя число в формате int, пока не введет в верном формате
         /// </summary>
         /// <param name="message">Сообщеине, которое спросят у пользователя в коносли</param>
-        /// <returns></returns>
-        static int GetInt(string message)
+        /// <returns>Число</returns>
+        static int GetInt(string message, bool checkZero = true)
         {   
             while(true)
             {
@@ -396,14 +415,39 @@ namespace Eminem
                 {
                     Console.Write(message);
                     int num = Convert.ToInt32(Console.ReadLine());
+                    if (checkZero && num <= 0) throw new OverflowException("Число меньше или равно нулю.");
                     return num;
                 }
-                catch
-                {
+                catch (FormatException ex){
                     Console.WriteLine("Вы некорректно ввели число.");
+                }
+                catch (OverflowException ex){
+                    Console.WriteLine("Число выходит за допустимые пределы.");
                 }
             }
             
+        }
+        /// <summary>
+        /// Запрошивает у пользователя число в формате int, пока не введет в верном формате
+        /// </summary>
+        /// <param name="message">Сообщеине, которое спросят у пользователя в коносли</param>
+        /// <param name="max">Верхняя допустимая граница (включительно)</param>
+        /// <param name="min">Нижняя граница (не включительно)</param>
+        /// <returns></returns>
+        static int GetInt(string message, int max, int min = 0)
+        {
+            while (true)
+            {
+                int num = GetInt(message);
+                if (num > min && num <= max)
+                    return num;
+                else
+                    Console.WriteLine(
+                        "Вы ввели число, выходящее за границы массива, \n" +
+                        $"напоминаем, что граница массива: 1...{max}"
+                    );
+            }
+
         }
     }
 
