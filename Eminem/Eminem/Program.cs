@@ -454,7 +454,7 @@ namespace Eminem
         {
             Console.WriteLine($"{message} \n Да - '1' Нет - '2': ");
             string qw;
-            do { qw = Console.ReadLine(); } while (qw != "1" || qw != "2");
+            do { qw = Console.ReadLine(); } while (qw != "1" && qw != "2");
             return qw == "1";
         }
     }
