@@ -16,7 +16,7 @@ namespace Eminem
         static string CabelDlinaFloor;
         static string BetweenZdaniiCabel = "Нет необходимости соединения зданий";
 
-
+        [STAThreadAttribute]
         static void Main(string[] args)
         {
             //Test.TestFunc();
@@ -29,7 +29,7 @@ namespace Eminem
             Console.ReadLine();
 
             // контекстный менеджер, правильно закроет файл, если во время блока произойдет какая нибудь фигня (исключение)
-            using (MyDocument document = new MyDocument(true) {Visible = false})
+            using (MyDocument document = new MyDocument(true, false) {Visible = false})
             {
                 //ToDo поменять все читания инта с консоли на метод GetInt
                 //ToDo поменять все каскады Console.WriteLine(...) на интерполяию
@@ -217,13 +217,12 @@ namespace Eminem
 
                         if (BuildsObj.build[v].height * BuildsObj.build[v].floor_num > 100)
                             Console.WriteLine("Требуется применение дополнительных устройств усиления для вертикальных кабелей");
-                        Console.WriteLine("Вы согласны? 1 - Да, 2 - Нет ");
 
                         int len = 0;
                         for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
                             len += BuildsObj.build[v].height * i5;
 
-                        if (Console.ReadLine() == "2")
+                        if (!Question(""))
                         {
                             BuildsObj.build[v].cabel_type = "оптоволокно";
                             itog_dlina_optovolokno = len;
@@ -233,7 +232,10 @@ namespace Eminem
                     }
                     else
                     {
-                        Console.WriteLine("В здании № " + (v + 1) + " предполагается использование оптоволоконного кабеля, поскольку нагрузка на сеть больше 1000 Мб/c, использование другого типа кабеля не доступно");
+                        Console.WriteLine(
+                            $"В здании № { (v + 1)} предполагается использование оптоволоконного кабеля," +
+                            $" поскольку нагрузка на сеть больше 1000 Мб/c," +
+                            $" использование другого типа кабеля не доступно");
                         BuildsObj.build[v].cabel_type = "оптоволокно";
                     }
 

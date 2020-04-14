@@ -7,27 +7,40 @@ using Word = Microsoft.Office.Interop.Word;
 using System.Reflection;
 using System.IO;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Eminem
 {
+    /// <summary>
+    /// Фасад для работы с документом. Открытие, запорление, сохранение.
+    /// </summary>
     class MyDocument : IDisposable
     {
         private Word.Application application;
         private Word.Document document;
         private Object missingObj = System.Reflection.Missing.Value;
-        private Object trueObj = true;
         private Object falseObj = false;
         
         private string FilePatch;
         private string SaveFilePatch;
         public bool Visible { get { return application.Visible; } set { application.Visible = value; } }
 
-        public MyDocument(bool killAllProcesses)
+        public MyDocument(bool killAllProcesses, bool autoFind=true)
         {
-            string current_dir = Directory.GetCurrentDirectory();
-            string main_folder = Directory.GetParent(current_dir).Parent.Parent.Parent.FullName;
-            FilePatch = main_folder + "\\Patterns\\pattern.docx";
-            SaveFilePatch = main_folder + "\\Patterns\\result.doc";
+            string pathToPatternFolder;
+            if (!autoFind) {
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                dialog.SelectedPath = Directory.GetCurrentDirectory();
+                dialog.Description = "Выберите папку Patterns, в которой содержится документ pattern.docx";
+                while (dialog.ShowDialog() != DialogResult.OK);
+                pathToPatternFolder = dialog.SelectedPath;
+            }
+            else
+                pathToPatternFolder = Directory.GetParent(Directory.GetCurrentDirectory()).
+                    Parent.Parent.Parent.FullName + "\\Patterns";
+            
+            FilePatch = pathToPatternFolder + "\\pattern.docx";
+            SaveFilePatch = pathToPatternFolder + "\\result.doc";
             if (!File.Exists(FilePatch))
                 throw new Exception($"Не найден шаблон заполнение отчета по пути: {FilePatch}");
             if (killAllProcesses)
@@ -44,8 +57,6 @@ namespace Eminem
             application = new Word.Application();
             // создаем путь к файлу
             Object templatePathObj = FilePatch;
-
-            // если вылетим не этом этапе, приложение останется открытым
             try
             {
                 document = application.Documents.Add(ref templatePathObj, ref missingObj, ref missingObj, ref missingObj);
