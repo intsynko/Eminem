@@ -246,29 +246,39 @@ namespace Emionov_root
         /// <returns>bool - смог ли проставить нагрузку</returns>        
         public static bool load_to_way(ref Connect connect, int[,] connect_length_copy, int build_1, int build_2, int load) 
         {
-            bool check = false;
+            /* 
+                Функция просавления нагрузки на кабеля между зданиями.
+                Здесь реализован поиск связи между зданиями по графу связей в глубину.
+                Подробнее об алгоритме: https://ru.wikipedia.org/wiki/%D0%9F%D0%BE%D0%B8%D1%81%D0%BA_%D0%B2_%D0%B3%D0%BB%D1%83%D0%B1%D0%B8%D0%BD%D1%83
+
+                Рекурсивная фукнция, просматривает все связи пока не дойдет до нужной вершины, если 
+                вершина будет найдена в вызывающую функцию вернется true, и будет проставлена нагрузка
+                на все ребра пути до здания. Если связь не будет найдена - то тогда в вызывающую функцию вернется false.
+            */
+            // искомая вершина = вершине старта - мы достигли цели
             if (build_1 == build_2)
                 return true;
+            // иначе мы начиаем просматривать все оставшиеся связи данной вершины
             for (int i = 0; i < connect_length_copy.GetLength(0); i++)
             {
                 // если первое здание с iым соединены
                 if (connect_length_copy[build_1, i] != 0)
                 {
-                    // разъединяем первое здание с iым
+                    // разъединяем первое здание с iым (проставляем, что эту связь мы посетили)
                     connect_length_copy[build_1, i] = 0;
                     connect_length_copy[i, build_1] = 0;
-                    // тоже самое применяем для второго здания с iым
+                    // если iое здание связано с конечным
                     if (load_to_way(ref connect, connect_length_copy, i, build_2, load))
                     {
-                        // и вместо расстояния между зданиями пишем нагрузку мазафака!!!!
-                        // логика просто космос
+                        // проставляем нагрузку между зданиями
                         connect.connect_load[build_1, i] += load;
                         connect.connect_load[i, build_1] += load;
-                        check = true;
+                        // цель достигнута мы достигли искомой вершины
+                        return true;
                     }
                 }
             }
-            return check;
+            return false;
         }
         /// <summary>
         /// высчитывание требований этажа
