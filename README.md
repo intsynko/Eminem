@@ -4,21 +4,28 @@ This is a some program to calculate values for course work
 of subject "Infocommunication systems and networks"  of Eminov F.I.
 
 ## Run
-To run you must open project in visual studio, and vs generate 
-folder `Eminem\Eminem\Eminem\bin\Debug`. In This folder will generated
-`Eminem.exe`. You can run project in vs or `Eminem.exe`.
+1) You can watch [already ready releses](https://github.com/Kostya-228/Eminem/releases)
 
-Pattern of cource work in `Eminem\Patterns\pattern.docx`, also in this 
-folder will generating `result.doc`.
+2) To tun in visual studio:
+    1) Open project in visual studio 17 or later
+    2) Download nuget package Microsoft.Office.Interop.Word
+    3) Add linq to System.Windows.Forms
+ 
+Program takes as base a `Patterns/pattern.docx` and on this base
+will generated `Patterns/result.docx` with inserted values.
 
 ## Описание
 Это программа для вычисления значений курсовой работы предмета 
 "Инфокоммуникационные системы и технологии" Еминова Ф.И.
 
 ## Запуск
-Для запуска необходимо открыть проект в visual studio, и vs сгенерирует
-папку `Eminem\Eminem\Eminem\bin\Debug`. В этой папке будет сгенерирован 
-`Eminem.exe`. \ Вы можете запустить проект в vs или `Eminem.exe`.
-Шаблон курсовой в `Eminem\Patterns\pattern.docx`, так же в этой папке 
-сгенерируется `result.doc`.
+1) Можете просмотреть [уже готовые релизы](https://github.com/Kostya-228/Eminem/releases)
+
+2) Для запуска проекта в visual studio:
+    1) Откройте проект visual studio 17 или более поздней
+    2) Установите nuget пакет Microsoft.Office.Interop.Word
+    3) Добавьте ссылку на System.Windows.Forms
+
+Программа берет за основу `Patterns/pattern.docx` и на его основе 
+будет сгенерирован `Patterns/result.docx` с проставленными значениями.
 
