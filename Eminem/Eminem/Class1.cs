@@ -251,6 +251,7 @@ namespace Emionov_root
                 {
                     // разъединяем первое здание с iым
                     connect.connect_length[build_1, i] = 0;
+                    connect.connect_length[i, build_1] = 0;
                     // тоже самое применяем для второго здания с iым
                     if (load_to_way(ref connect, i, build_2, load))
                     {
