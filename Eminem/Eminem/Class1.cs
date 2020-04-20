@@ -77,7 +77,7 @@ namespace Emionov_root
     }
     public struct Connect
     {
-        public int[,] connect_length;//дб КВАДРАТНЫМ!!!
+        public int[,] connect_length; //дб КВАДРАТНЫМ!!!
         public int[,] connect_load;
         public string[,] connect_type;
     } 
@@ -173,6 +173,7 @@ namespace Emionov_root
                                                     // записать в путь нагрузку
                                                     if (!load_to_way(
                                                             ref connect,
+                                                            connect.connect_length,
                                                             i,
                                                             z,
                                                             builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[i].floor[fl].dep[de].workers
@@ -201,9 +202,10 @@ namespace Emionov_root
                                             {
                                                 if (builds.build[i].floor[fl].dep[de].tech[te].name.Equals(builds.build[z].floor[x].dep[c].tech[v].name) && builds.build[z].floor[x].dep[c].tech[v].user)
                                                 {
-                                                    //записать в путь нагрузку
+                                                    //записать нагрузку
                                                     if (!load_to_way(
                                                         ref connect,
+                                                        connect.connect_length,
                                                         i,
                                                         z,
                                                         builds.build[i].floor[fl].dep[de].tech[te].load * builds.build[z].floor[x].dep[c].workers
@@ -232,28 +234,31 @@ namespace Emionov_root
         }
 
         /// <summary>
-        /// метод заполнения пути
+        /// Функция проставления нагрузки связь между зданиями
         /// </summary>
         /// <param name="connect">объект связи</param>
+        /// <param name="connect_length_copy">копия матрицы связей, нужна 
+        /// для того чтобы можно было пройтись поиском в глубину пути до 
+        /// здания и подсчитать итоговое расстояние</param>
         /// <param name="build_1">номер первого здания</param>
         /// <param name="build_2">номер второго здания</param>
         /// <param name="load">нагрузка</param>
-        /// <returns></returns>        
-        public static bool load_to_way(ref Connect connect, int build_1, int build_2, int load) 
+        /// <returns>bool - смог ли проставить нагрузку</returns>        
+        public static bool load_to_way(ref Connect connect, int[,] connect_length_copy, int build_1, int build_2, int load) 
         {
             bool check = false;
             if (build_1 == build_2)
                 return true;
-            for (int i = 0; i < connect.connect_length.GetLength(0); i++)
+            for (int i = 0; i < connect_length_copy.GetLength(0); i++)
             {
                 // если первое здание с iым соединены
-                if (connect.connect_length[build_1, i] != 0)
+                if (connect_length_copy[build_1, i] != 0)
                 {
                     // разъединяем первое здание с iым
-                    connect.connect_length[build_1, i] = 0;
-                    connect.connect_length[i, build_1] = 0;
+                    connect_length_copy[build_1, i] = 0;
+                    connect_length_copy[i, build_1] = 0;
                     // тоже самое применяем для второго здания с iым
-                    if (load_to_way(ref connect, i, build_2, load))
+                    if (load_to_way(ref connect, connect_length_copy, i, build_2, load))
                     {
                         // и вместо расстояния между зданиями пишем нагрузку мазафака!!!!
                         // логика просто космос
