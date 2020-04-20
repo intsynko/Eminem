@@ -30,7 +30,7 @@ namespace Emionov_root
         public string cabel_type;
         public int floor_num;
         public int square;
-        public int height;
+        public float height;
         public Floor[] floor; //создаем массив с кол-вом этажей и их перечислениeм в каждой ячейке
         public Build_req build_req;
 
@@ -69,7 +69,7 @@ namespace Emionov_root
     }
     public struct Build_req //только для расчета между этажами NADO VIVESTI
     {
-        public int cabel_length;
+        public float cabel_length;
         public int cab_can_length;
         public int swch_num; //возможно расположение некоторых свичей на разных этажах, при 2+ свичах третий с магистрального допом
         public int swch_chan;

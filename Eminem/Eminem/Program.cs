@@ -20,8 +20,8 @@ namespace Eminem
         static void Main(string[] args)
         {
             //Test.TestFunc();
-            int itog_dlina_ethernet = 0;
-            int itog_dlina_optovolokno = 0;
+            float itog_dlina_ethernet = 0;
+            float itog_dlina_optovolokno = 0;
             int itog_dlina_koaks = 0;
             int cab_can_dlina_itog = 0;
 
@@ -109,7 +109,7 @@ namespace Eminem
                     floor_num += BuildsObj.build[i].floor_num + ",";
                     BuildsObj.build[i].square = GetInt($"Введите площадь этажа здания №{i + 1}: ");
                     squre_num += BuildsObj.build[i].square + ",";
-                    BuildsObj.build[i].height = GetInt($"Введите высоту этажа здания №{i + 1}: ");
+                    BuildsObj.build[i].height = GetFlaot($"Введите высоту этажа здания №{i + 1}");
                     hight_num += BuildsObj.build[i].height;
                     int mob_st = GetInt($"Введите количество мобильных станций здания №{i + 1}: ");
                     mob_st_num += mob_st + ",";
@@ -218,7 +218,7 @@ namespace Eminem
                         if (BuildsObj.build[v].height * BuildsObj.build[v].floor_num > 100)
                             Console.WriteLine("Требуется применение дополнительных устройств усиления для вертикальных кабелей");
 
-                        int len = 0;
+                        float len = 0;
                         for (int i5 = 0; i5 < BuildsObj.build[v].floor_num; i5++)
                             len += BuildsObj.build[v].height * i5;
 
@@ -396,13 +396,44 @@ namespace Eminem
         }
 
 
-        
+
+        /// <summary>
+        /// Запрошивает у пользователя число в формате float, пока не введет в верном формате 
+        /// </summary>
+        /// <param name="message">Сообщеине, которое спросят у пользователя в коносли</param>
+        /// <param name="checkNegativeAndkZero"></param>
+        /// <returns>Число</returns>
+        static float GetFlaot(string message, bool checkNegativeAndkZero = true)
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.Write($"{message} (дробное число пешется через запятую, например 3,5):");
+                    float num = (float)Convert.ToDouble(Console.ReadLine());
+                    if (checkNegativeAndkZero && num <= 0) throw new OverflowException("Число меньше или равно нулю.");
+                    return num;
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine("Вы некорректно ввели число.");
+                }
+                catch (OverflowException ex)
+                {
+                    Console.WriteLine("Число выходит за допустимые пределы.");
+                }
+            }
+
+        }
+
+
         /// <summary>
         /// Запрошивает у пользователя число в формате int, пока не введет в верном формате
         /// </summary>
         /// <param name="message">Сообщеине, которое спросят у пользователя в коносли</param>
+        /// <param name="checkNegativeAndkZero">Проверять на отриц./нулевое значение</param>
         /// <returns>Число</returns>
-        static int GetInt(string message, bool checkZero = true)
+        static int GetInt(string message, bool checkNegativeAndkZero = true)
         {   
             while(true)
             {
@@ -410,7 +441,7 @@ namespace Eminem
                 {
                     Console.Write(message);
                     int num = Convert.ToInt32(Console.ReadLine());
-                    if (checkZero && num <= 0) throw new OverflowException("Число меньше или равно нулю.");
+                    if (checkNegativeAndkZero && num <= 0) throw new OverflowException("Число меньше или равно нулю.");
                     return num;
                 }
                 catch (FormatException ex){
