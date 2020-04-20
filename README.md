@@ -14,6 +14,12 @@ of subject "Infocommunication systems and networks"  of Eminov F.I.
 Program takes as base a `Patterns/pattern.docx` and on this base
 will generated `Patterns/result.docx` with inserted values.
 
+Original program code in commit
+[inital](https://github.com/Kostya-228/Eminem/commit/18cd665cdd89ce9c7e858838c40a0f7eacffcad3).
+
+[First version](https://github.com/Kostya-228/Eminem/commit/3928f96ce1827ac18a353d81376cf4fa141d346c)
+, whitch can run with original code.
+
 ## Описание
 Это программа для вычисления значений курсовой работы предмета 
 "Инфокоммуникационные системы и технологии" Еминова Ф.И.
@@ -28,4 +34,10 @@ will generated `Patterns/result.docx` with inserted values.
 
 Программа берет за основу `Patterns/pattern.docx` и на его основе 
 будет сгенерирован `Patterns/result.docx` с проставленными значениями.
+
+Оригинальный код программы находится в коммите 
+[inital](https://github.com/Kostya-228/Eminem/commit/18cd665cdd89ce9c7e858838c40a0f7eacffcad3).
+
+[Первая версия](https://github.com/Kostya-228/Eminem/commit/3928f96ce1827ac18a353d81376cf4fa141d346c)
+, которую можно запускать с оригинальным кодом
 
