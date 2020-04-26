@@ -97,25 +97,24 @@ namespace Eminem
         }
         public void Replase(string strToFind, string replaceStr)
         {
+            int max = 250;
             // обьектные строки для Word
             object strToFindObj = strToFind;
             object replaceStrObj = replaceStr;
-            // диапазон документа Word
-            Word.Range wordRange;
             //тип поиска и замены
             object replaceTypeObj;
             replaceTypeObj = Word.WdReplace.wdReplaceAll;
-            while (replaceStr.Length > 0)
             // обходим все разделы документа
+            while (replaceStr.Length > 0)
             {
                 string buf = string.Copy(replaceStr);
+                int freePlace = max - strToFind.Length;
                 // если строки слишком длинная, чтобы сразу заменять флаг на неё полнось (макс 255 символов на замену)
-                if (255 - strToFind.Length <= replaceStr.Length)
+                if (freePlace <= replaceStr.Length)
                 {
-                    int z = 255 - strToFind.Length;
-                    buf = buf.Remove(z + 1); // в буфере обрезаем сторку до максиально возможной длины
+                    buf = buf.Remove(freePlace + 1); // в буфере обрезаем сторку до максиально возможной длины
                     buf += strToFind; // добавляем флаг
-                    replaceStr = replaceStr.Remove(0, z); // урезаем строку сначала, остается тоьлко то, что не попало в буфер
+                    replaceStr = replaceStr.Remove(0, freePlace); // урезаем строку сначала, остается тоьлко то, что не попало в буфер
                 }
                 else
                     // иначе строка полностью попадает в буфер и мы её затираем
@@ -124,8 +123,8 @@ namespace Eminem
                 for (int i = 1; i <= document.Sections.Count; i++)
                 {
                     // берем всю секцию диапазоном
-                    wordRange = document.Sections[i].Range;
-                    Word.Find wordFindObj = wordRange.Find;
+                    //wordRange = document.Sections[i].Range;
+                    Word.Find wordFindObj = document.Sections[i].Range.Find;
                     object[] wordFindParameters = new object[15] { strToFindObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, replaceStrObj, replaceTypeObj, missingObj, missingObj, missingObj, missingObj };
                     wordFindObj.GetType().InvokeMember("Execute", BindingFlags.InvokeMethod, null, wordFindObj, wordFindParameters);
 

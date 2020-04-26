@@ -384,6 +384,7 @@ namespace Eminem
                 document.ReplaseTable("@@IP", ip_table, ip_table_header, 7);
                 document.Replase("@@techolog", use_tech);
                 document.Replase("@@ equipment", use_eq);
+                Console.WriteLine("Готово. Нажмите Enter, чтобы закрыть.");
                 Console.Read();
             }
             
