@@ -5,10 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Emionov_root;
 
-
-//using Eminem.Entities;
-
-
 namespace Eminem
 {
     class Program
@@ -16,25 +12,21 @@ namespace Eminem
         static string CabelDlinaFloor;
         static string BetweenZdaniiCabel = "Нет необходимости соединения зданий";
 
-        [STAThreadAttribute]
+        [STAThreadAttribute] // тэг нужен для работы диалогово окна
         static void Main(string[] args)
         {
-            //Test.TestFunc();
             float itog_dlina_ethernet = 0;
             float itog_dlina_optovolokno = 0;
             int itog_dlina_koaks = 0;
             int cab_can_dlina_itog = 0;
+            bool release = true;
+#if DEBUG
+    release = false;
+#endif
 
-            Console.Write("Осторожно! Убивает все открытые процессы ворда при запуске.\nДля продолжения нажмите ENTER:");
-            Console.ReadLine();
-
-            // контекстный менеджер, правильно закроет файл, если во время блока произойдет какая нибудь фигня (исключение)
-            using (MyDocument document = new MyDocument(true, false) {Visible = false})
+            // контекстный менеджер, правильно закроет файл, если внутри блока произойдет какая нибудь фигня (исключение)
+            using (MyDocument document = new MyDocument(killAllProcesses: true, askByDialogWindow: release) {Visible = false})
             {
-                //ToDo поменять все читания инта с консоли на метод GetInt
-                //ToDo поменять все каскады Console.WriteLine(...) на интерполяию
-                //ToDo вообще применить интерполяцию там, где это возможно
-
                 string message = "Введите номер вашего варианта, первая цифра это последняя цифра номера группы, вторая и третья цифра это ваш вариант.\n Например, 901: ";
                 int nom_var = GetInt(message);
                 document.Replase("VariantKurs", nom_var.ToString());
@@ -48,7 +40,7 @@ namespace Eminem
                     "Характер решаемой задачи"
                 };
                 
-                // заполнение сведений о ИС
+                // заполнение сведений о ИС (, название,)
                 string[,] tehno_tab = new string[InformationSystemCount, 3];
                 for (int k = 0; k < InformationSystemCount; k++)
                 {
@@ -93,17 +85,18 @@ namespace Eminem
                     "Организационные единицы",
                     "Характер решаемой задачи"
                 };
-                int department_count = 0;
-                string[,] depart_tech = new string[department_count + 1, 5];
+                int department_counter = 0;
+                string[,] depart_tech = new string[department_counter + 1, 5];
                 Connect ConnectObj = new Connect();
                 ConnectObj.connect_length = matrix;
                 int i, all_workers = 0;
                 BuildsObj.build = new Build[BuildsCount];
+                // божественноое объявление преременных
                 string floor_num = "", squre_num = "", hight_num = "", workers_num = "", mob_st_num = "", descr_otd = "", use_eq = "", uninterruptedpower = "";
                 for (i = 0; i < BuildsCount; i++)
                 {
                     Console.WriteLine($"----------Здание {i + 1}----------------");
-                    descr_otd += " В здании №" + i + "находятся: ";
+                    descr_otd += $"В здании №{i+1} находятся: ";
                     BuildsObj.build[i] = new Build();
                     BuildsObj.build[i].floor_num = GetInt($"Введите количество этажей здания №{i + 1}: ");
                     floor_num += BuildsObj.build[i].floor_num + ",";
@@ -119,7 +112,7 @@ namespace Eminem
                     for (int i1 = 0; i1 < BuildsObj.build[i].floor_num; i1++)
                     {
                         Console.WriteLine($"----------Этаж {i1 + 1}----------------");
-                        descr_otd += i1 + "этаж - ";
+                        descr_otd += $"{i1+1} Этаж: ";
                         int workers = 0;
 
                         Console.WriteLine("----------Напоминалка------------");
@@ -141,7 +134,7 @@ namespace Eminem
                             Console.WriteLine($"----------Отдел {i2 + 1}----------------");
                             Console.Write($"Введите название отдела: ");
                             BuildsObj.build[i].floor[i1].dep[i2].name = Console.ReadLine();
-                            depart_tech[department_count, 0] = BuildsObj.build[i].floor[i1].dep[i2].name;
+                            depart_tech[department_counter, 0] = BuildsObj.build[i].floor[i1].dep[i2].name;
 
                             message = $"Введите количество работников отдела:" ;
                             BuildsObj.build[i].floor[i1].dep[i2].workers = GetInt(message);
@@ -156,15 +149,15 @@ namespace Eminem
 
                                 message = "Введите номер Информационной системы, которая используется в отделе: ";
                                 BuildsObj.build[i].floor[i1].dep[i2].tech[i3] = TechnologyArray[GetInt(message, TechnologyArray.Length) - 1];
-                                depart_tech[department_count, 2] += BuildsObj.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
+                                depart_tech[department_counter, 2] += BuildsObj.build[i].floor[i1].dep[i2].tech[i3].name + "^P"; // что это за знак???
                                 BuildsObj.build[i].floor[i1].dep[i2].tech[i3].user = true;
-                                depart_tech[department_count, 1] += "^i";
-                                depart_tech[department_count, 1] += "Пользователь";
+                                depart_tech[department_counter, 1] += "^i";
+                                depart_tech[department_counter, 1] += "Пользователь";
 
                                 if (Question("Является ли отдел корневым отделом, к которому идут все запросы?"))
                                 {
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = true;
-                                    depart_tech[department_count, 1] += ",Сервер";
+                                    depart_tech[department_counter, 1] += ",Сервер";
                                 }
                                 else
                                     BuildsObj.build[i].floor[i1].dep[i2].tech[i3].root = false;
@@ -175,9 +168,10 @@ namespace Eminem
                                     "между зданиями."
                                 );
                             }
-                            descr_otd += BuildsObj.build[i].floor[i1].dep[i2].name + " (" + BuildsObj.build[i].floor[i1].dep[i2].workers + " рабочих станций), ";
-                            department_count++;
-                            string[,] buf_mas = new string[department_count + 1, 5];
+                            Department dep = BuildsObj.build[i].floor[i1].dep[i2];
+                            descr_otd += $"{dep.name} ({dep.workers} рабочих станций), ";
+                            department_counter++;
+                            string[,] buf_mas = new string[department_counter + 1, 5];
                             Array.Copy(depart_tech, buf_mas, depart_tech.Length);
                             depart_tech = buf_mas;
                             Console.WriteLine("--------------------------------");

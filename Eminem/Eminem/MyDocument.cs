@@ -12,23 +12,33 @@ using System.Windows.Forms;
 namespace Eminem
 {
     /// <summary>
-    /// Фасад для работы с документом. Открытие, запорление, сохранение.
+    /// Фасад для работы с документом. Открытие, заполение, сохранение.
     /// </summary>
     class MyDocument : IDisposable
     {
+        // блок объектов для работы с api word'а
         private Word.Application application;
         private Word.Document document;
         private Object missingObj = System.Reflection.Missing.Value;
         private Object falseObj = false;
         
-        private string FilePatch;
-        private string SaveFilePatch;
+        // пути к файлам (пределяются в конструкторе)
+        private string PatternPath;
+        private string ResultPath;
+
+        // видимость документа
         public bool Visible { get { return application.Visible; } set { application.Visible = value; } }
 
-        public MyDocument(bool killAllProcesses, bool autoFind=true)
+        /// <summary>
+        /// Пытаемся открыть шаблон
+        /// </summary>
+        /// <param name="killAllProcesses">убивать ли все процессы ворда</param>
+        /// <param name="askByDialogWindow">спросить ли через диалоговое окно путь к папке, false = взять дефолтный путь</param>
+        public MyDocument(bool killAllProcesses, bool askByDialogWindow=true)
         {
+            // итоговый путь к папке
             string pathToPatternFolder;
-            if (!autoFind) {
+            if (askByDialogWindow) {
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
                 dialog.SelectedPath = Directory.GetCurrentDirectory();
                 dialog.Description = "Выберите папку Patterns, в которой содержится документ pattern.docx";
@@ -39,12 +49,16 @@ namespace Eminem
                 pathToPatternFolder = Directory.GetParent(Directory.GetCurrentDirectory()).
                     Parent.Parent.Parent.FullName + "\\Patterns";
             
-            FilePatch = pathToPatternFolder + "\\pattern.docx";
-            SaveFilePatch = pathToPatternFolder + "\\result.doc";
-            if (!File.Exists(FilePatch))
-                throw new Exception($"Не найден шаблон заполнение отчета по пути: {FilePatch}");
+            PatternPath = pathToPatternFolder + "\\pattern.docx";
+            ResultPath = pathToPatternFolder + "\\result.doc";
+            if (!File.Exists(PatternPath))
+                throw new Exception($"Не найден шаблон заполнения отчета по пути: {PatternPath}");
             if (killAllProcesses)
+            {
+                Console.Write("Осторожно! Убивает все открытые процессы ворда при запуске.\nДля продолжения нажмите ENTER:");
+                Console.ReadLine();
                 KillAllWordProcesses();
+            }
             Open_doc();
         }
         public void Dispose()
@@ -53,10 +67,20 @@ namespace Eminem
         }
         private void Open_doc()
         {
-            //создаем обьект приложения word
-            application = new Word.Application();
+            try
+            {
+                //создаем обьект приложения word
+                application = new Word.Application();
+            }
+            catch (System.Runtime.InteropServices.COMException ex)
+            {
+                Console.WriteLine($"Ошибка создания приложения ворд, возможно на компьютере не установлен Office Word.");
+                CloseDoc();
+                throw ex;
+            }
+            
             // создаем путь к файлу
-            Object templatePathObj = FilePatch;
+            Object templatePathObj = PatternPath;
             try
             {
                 document = application.Documents.Add(ref templatePathObj, ref missingObj, ref missingObj, ref missingObj);
@@ -67,15 +91,7 @@ namespace Eminem
                     $"Ошибка доступа. Откройте шаблонный документ и разрешите редактирование. " +
                     $"Шаблонный документ нах-ся по адресу: {templatePathObj}"
                 );
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-                if (document != null)
-                    document.Close(ref falseObj, ref missingObj, ref missingObj);
-                application.Quit(ref missingObj, ref missingObj, ref missingObj);
-                document = null;
-                application = null;
+                CloseDoc();
                 throw ex;
             }
         }
@@ -89,38 +105,33 @@ namespace Eminem
             //тип поиска и замены
             object replaceTypeObj;
             replaceTypeObj = Word.WdReplace.wdReplaceAll;
-            int z = 0;
             while (replaceStr.Length > 0)
             // обходим все разделы документа
             {
-                bool ch = false;
-                if (255 - strToFind.Length > replaceStr.Length)
-                    z = replaceStr.Length;
-                else
-                { z = 255 - strToFind.Length; ch = true; }
                 string buf = string.Copy(replaceStr);
-
-                if (ch)
-                { buf += strToFind; buf = buf.Remove(z + 1); }
+                // если строки слишком длинная, чтобы сразу заменять флаг на неё полнось (макс 255 символов на замену)
+                if (255 - strToFind.Length <= replaceStr.Length)
+                {
+                    int z = 255 - strToFind.Length;
+                    buf = buf.Remove(z + 1); // в буфере обрезаем сторку до максиально возможной длины
+                    buf += strToFind; // добавляем флаг
+                    replaceStr = replaceStr.Remove(0, z); // урезаем строку сначала, остается тоьлко то, что не попало в буфер
+                }
+                else
+                    // иначе строка полностью попадает в буфер и мы её затираем
+                    replaceStr = "";
                 replaceStrObj = buf;
                 for (int i = 1; i <= document.Sections.Count; i++)
                 {
-
                     // берем всю секцию диапазоном
                     wordRange = document.Sections[i].Range;
-
                     Word.Find wordFindObj = wordRange.Find;
-
-
                     object[] wordFindParameters = new object[15] { strToFindObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, missingObj, replaceStrObj, replaceTypeObj, missingObj, missingObj, missingObj, missingObj };
-
-
                     wordFindObj.GetType().InvokeMember("Execute", BindingFlags.InvokeMethod, null, wordFindObj, wordFindParameters);
 
                 }
-                replaceStr = replaceStr.Remove(0, z);
             }
-            Object pathToSaveObj = SaveFilePatch;
+            Object pathToSaveObj = ResultPath;
             document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj);
 
         }
@@ -178,12 +189,13 @@ namespace Eminem
                 wordFindObj.GetType().InvokeMember("Execute", BindingFlags.InvokeMethod, null, wordFindObj, wordFindParameters);
 */
             }
-            Object pathToSaveObj = SaveFilePatch;
+            Object pathToSaveObj = ResultPath;
             document.SaveAs(ref pathToSaveObj, Word.WdSaveFormat.wdFormatDocument, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj, ref missingObj);
 
         }
         private void KillAllWordProcesses()
         {
+            Console.WriteLine("Убиваю все процессы word ...");
             if (Process.GetProcessesByName("winword").Count() > 0)
             {
                 System.Diagnostics.Process[] aProcWrd = System.Diagnostics.Process.GetProcessesByName("WINWORD");

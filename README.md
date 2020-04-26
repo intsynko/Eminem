@@ -4,6 +4,8 @@ This is a some program to calculate values for course work
 of subject "Infocommunication systems and networks"  of Eminov F.I.
 
 ## Run
+1) Reqirements:
+    1) Downloaded [Office Word](https://www.microsoft.com/ru-ru/microsoft-365/word)
 1) You can watch [already ready releses](https://github.com/Kostya-228/Eminem/releases)
 
 2) To tun in visual studio:
@@ -25,9 +27,11 @@ Original program code in commit
 "Инфокоммуникационные системы и технологии" Еминова Ф.И.
 
 ## Запуск
-1) Можете просмотреть [уже готовые релизы](https://github.com/Kostya-228/Eminem/releases)
+1) Требования:
+    1) Уcтановленный [Office Word](https://www.microsoft.com/ru-ru/microsoft-365/word)
+2) Можете просмотреть [уже готовые релизы](https://github.com/Kostya-228/Eminem/releases)
 
-2) Для запуска проекта в visual studio:
+3) Для запуска проекта в visual studio:
     1) Откройте проект visual studio 17 или более поздней
     2) Установите nuget пакет Microsoft.Office.Interop.Word
     3) Добавьте ссылку на System.Windows.Forms
